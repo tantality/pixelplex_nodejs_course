@@ -1,1 +1,2 @@
-console.log("Flashcards");
+// eslint-disable-next-line no-console
+console.log('Flashcards');
