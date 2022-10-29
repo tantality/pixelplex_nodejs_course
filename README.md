@@ -81,6 +81,21 @@ UserDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The user is already logged in."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "The user with the specified email does not exist."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Incorrect e-mail."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Incorrect password."}
+    ```
+
 - `GET api/v1/auth/logout` - эндпоинт для выхода пользователя из системы. Id пользователя получается из accessToken.
   Возвращает следующий DTO:
   ```TypeScript
@@ -89,6 +104,10 @@ UserDTO{
     message: "The user logged out."
   }
   ```
+  Возможная ошибка:
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
 - `GET api/v1/auth/refreshTokens` - эндпоинт для обнолвления токенов пользователя. Id пользователя получается из accessToken.
 
   Возвращает следующий DTO:
@@ -103,6 +122,12 @@ UserDTO{
     }
   }
   ```
+
+  Возможная ошибка:
+
+  - ```TypeScript
+     { statusCode: 401, message: "Failed to update tokens. Access token is missing or invalid."}
+    ```
 
 ### Users
 
@@ -132,7 +157,31 @@ UserDTO{
   }
   ```
 
-- `PATCH api/v1/users/{userId}` - эндпоинт для редактирование данных пользователя.
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The user with the specified email already exists."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid e-mail."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid name."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid password."}
+    ```
+
+- `PUT api/v1/users/{userId}` - эндпоинт для редактирования данных пользователя.
+
+  Принимает следующий параметр:
+
+  ```TypeScript
+  userId: string
+  ```
 
   Ожидает следующее тело запроса:
 
@@ -153,6 +202,27 @@ UserDTO{
     user: UserDTO
   }
   ```
+
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The user with the specified email already exists."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid e-mail."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid name."}
+    ```
 
 ### Languages
 
@@ -187,6 +257,15 @@ LanguageDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid query parameter(s)."}
+    ```
+
 - `POST api/v1/languages` - эндпоинт для создания языка.
 
   Ожидает следующее тело запроса:
@@ -208,7 +287,22 @@ LanguageDTO{
   }
   ```
 
-- `PАTCH api/v1/languages/{languageId}` - эндпоинт для обновления определенного языка.
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The language with the specified code already exists."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid code."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid name."}
+    ```
+
+- `PUT api/v1/languages/{languageId}` - эндпоинт для обновления определенного языка.
 
   Принимает следующий параметр:
 
@@ -235,6 +329,24 @@ LanguageDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The language with the specified code already exists."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid code."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid name."}
+    ```
+
 - `DELETE api/v1/languages/{languageId}` - эндпоинт для удаления определенного языка.
 
   Принимает следующий параметр:
@@ -251,6 +363,15 @@ LanguageDTO{
     message: "The language has been deleted."
   }
   ```
+
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
 
 ### Users/Cards
 
@@ -302,6 +423,18 @@ MeaningDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid query parameter(s)."}
+    ```
+
 - `POST api/v1/users/{userId}/cards` - эндпоинт для создания карточки пользователя.
 
   Принимает следующий параметр:
@@ -336,6 +469,33 @@ MeaningDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The card with the specified data has already been created."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language(s) not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The translations array containing at least 2 elements was not received."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
+    ```
+
 - `POST api/v1/users/{userId}/cards/{cardId}/translations` - эндпоинт для добавления переводов слова в карточку пользователя.
 
   Принимает следующие параметры:
@@ -368,7 +528,34 @@ MeaningDTO{
   }
   ```
 
-- `PАTCH api/v1/users/{userId}/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The card already contains a translation(s) into the specified language(s)."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Card not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language(s) not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "A valid array of translations was not received."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
+    ```
+
+- `PUT api/v1/users/{userId}/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
 
   Принимает следующие параметры:
 
@@ -395,6 +582,42 @@ MeaningDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 422, message: "The card already contains a translation(s) into the specified language(s)."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Card not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language(s) not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Translation(s) not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Meaning(s) not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "A valid array of translations was not received."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
+    ```
+
 - `DELETE api/v1/users/{userId}/cards/{cardId}` - эндпоинт для удаления определенной карточки пользователя.
 
   Принимает следующие параметры:
@@ -412,6 +635,18 @@ MeaningDTO{
     message: "The user card has been deleted."
   }
   ```
+
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Card not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
 
 ### Users/Tasks
 
@@ -457,6 +692,18 @@ UserTaskDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid query parameter(s)."}
+    ```
+
 - `POST api/v1/users/{userId}/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
 
   Принимает следующий параметр:
@@ -499,6 +746,21 @@ UserTaskDTO{
   }
   ```
 
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid query parameter(s)."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid array of language identifiers."}
+    ```
+
 - `POST api/v1/users/{userId}/tasks` - эндпоинт создания задания для пользователя.
 
   Принимает следующий параметр:
@@ -529,7 +791,22 @@ UserTaskDTO{
   }
   ```
 
-- `PATCH api/v1/users/{userId}/tasks/{taskId}` - эндпоинт для отправки ответа на задание.
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Invalid type."}
+    ```
+
+- `PUT api/v1/users/{userId}/tasks/{taskId}` - эндпоинт для отправки ответа на задание.
 
   Принимает следующие параметры:
 
@@ -555,3 +832,15 @@ UserTaskDTO{
     task: UserTaskDTO
   }
   ```
+
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "User not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 404, message: "Task not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
