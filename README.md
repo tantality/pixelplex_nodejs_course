@@ -39,7 +39,7 @@
 - Авторизованный пользователь может просмотреть статистику по правильным/неправильным ответам за выбранный период и по выбранным языкам.
 
 # API
-
+Id пользователя получается из accessToken.
 ### Auth
 
 ```TypeScript
@@ -57,81 +57,7 @@ UserDTO{
 }
 ```
 
-- `POST api/v1/auth/login` - эндпоинт для логина пользователя.
-
-  Ожидает следующее тело запроса:
-
-  ```TypeScript
-  {
-    password: string,
-    email: string
-  }
-  ```
-
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  {
-    statusCode: 200,
-    message: "Authentification succeeded.",
-    user: {
-    ...AuthDTO,
-    ...UserDTO
-   }
-  }
-  ```
-
-  Возможные ошибки:
-
-  - ```TypeScript
-     { statusCode: 422, message: "The user is already logged in."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "The user with the specified email does not exist."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Incorrect e-mail."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Incorrect password."}
-    ```
-
-- `GET api/v1/auth/logout` - эндпоинт для выхода пользователя из системы. Id пользователя получается из accessToken.
-  Возвращает следующий DTO:
-  ```TypeScript
-  {
-    statusCode: 200,
-    message: "The user logged out."
-  }
-  ```
-  Возможная ошибка:
-  - ```TypeScript
-     { statusCode: 401, message: "Access token is missing or invalid."}
-    ```
-- `GET api/v1/auth/refreshTokens` - эндпоинт для обнолвления токенов пользователя. Id пользователя получается из accessToken.
-
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  {
-    statusCode: 200,
-    message: "Tokens have been updated.",
-    user: {
-     ...UserDTO,
-     ...AuthDTO
-    }
-  }
-  ```
-
-  Возможная ошибка:
-
-  - ```TypeScript
-     { statusCode: 401, message: "Failed to update tokens. Access token is missing or invalid."}
-    ```
-
-### Users
-
-- `POST api/v1/users` - эндпоинт для создания пользователя.
+- `POST api/v1/auth/sign-up` - эндпоинт для регистриации пользователя.
 
   Ожидает следующее тело запроса:
 
@@ -149,7 +75,6 @@ UserDTO{
   ```TypeScript
   {
     statusCode: 201,
-    message: "The user has been registered.",
     user: {
      ...UserDTO,
      ...AuthDTO
@@ -175,13 +100,75 @@ UserDTO{
      { statusCode: 400, message: "Invalid password."}
     ```
 
-- `PUT api/v1/users/{userId}` - эндпоинт для редактирования данных пользователя.
+- `POST api/v1/auth/log-in` - эндпоинт для логина пользователя.
 
-  Принимает следующий параметр:
+  Ожидает следующее тело запроса:
 
   ```TypeScript
-  userId: string
+  {
+    password: string,
+    email: string
+  }
   ```
+
+  Возвращает следующий DTO:
+
+  ```TypeScript
+  {
+    statusCode: 200,
+    user: {
+    ...AuthDTO,
+    ...UserDTO
+   }
+  }
+  ```
+
+  Возможные ошибки:
+
+  - ```TypeScript
+     { statusCode: 404, message: "The user with the specified email does not exist."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Incorrect password."}
+    ```
+
+- `GET api/v1/auth/log-out` - эндпоинт для выхода пользователя из системы.
+
+  Возвращает следующий DTO:
+
+  ```TypeScript
+  { statusCode: 200 }
+  ```
+
+  Возможная ошибка:
+
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+
+- `GET api/v1/auth/refresh-tokens` - эндпоинт для обнолвления токенов пользователя.
+
+  Возвращает следующий DTO:
+
+  ```TypeScript
+  {
+    statusCode: 200,
+    user: {
+     ...UserDTO,
+     ...AuthDTO
+    }
+  }
+  ```
+
+  Возможная ошибка:
+
+  - ```TypeScript
+     { statusCode: 401, message: "Failed to update tokens. Access token is missing or invalid."}
+    ```
+
+### Users
+
+- `PUT api/v1/users` - эндпоинт для редактирования данных пользователя.
 
   Ожидает следующее тело запроса:
 
@@ -198,7 +185,6 @@ UserDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "User data has been updated.",
     user: UserDTO
   }
   ```
@@ -207,9 +193,6 @@ UserDTO{
 
   - ```TypeScript
      { statusCode: 422, message: "The user with the specified email already exists."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
     ```
   - ```TypeScript
      { statusCode: 404, message: "Language not found."}
@@ -241,9 +224,9 @@ LanguageDTO{
 
   ```TypeScript
   search: string,
-  page: number,
+  offset: number,
   limit: number,
-  sort: "date" | "name",
+  sortBy: "date" | "name",
   sortDirection: "asc" | "desc"
   ```
 
@@ -252,7 +235,7 @@ LanguageDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The list of languages was received.",
+    numberOfRecords: number,
     languages: Array<LanguageDTO>
   }
   ```
@@ -282,7 +265,6 @@ LanguageDTO{
   ```TypeScript
   {
     statusCode: 201,
-    message: "The language was created.",
     language: LanguageDTO
   }
   ```
@@ -291,6 +273,9 @@ LanguageDTO{
 
   - ```TypeScript
      { statusCode: 422, message: "The language with the specified code already exists."}
+    ```
+  - ```TypeScript
+     { statusCode: 403, message: "This action is available only to the administrator."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
@@ -324,7 +309,6 @@ LanguageDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The language has been updated.",
     language: LanguageDTO
   }
   ```
@@ -336,6 +320,9 @@ LanguageDTO{
     ```
   - ```TypeScript
      { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 403, message: "This action is available only to the administrator."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
@@ -358,16 +345,16 @@ LanguageDTO{
   Возвращает следующий DTO:
 
   ```TypeScript
-  {
-    statusCode: 200,
-    message: "The language has been deleted."
-  }
+  { statusCode: 200 }
   ```
 
   Возможные ошибки:
 
   - ```TypeScript
      { statusCode: 404, message: "Language not found."}
+    ```
+  - ```TypeScript
+     { statusCode: 403, message: "This action is available only to the administrator."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
@@ -378,7 +365,7 @@ LanguageDTO{
 ```TypeScript
 UserCardDTO{
   cardId: string,
-  words: Array<TranslationDTO>,
+  translations: Array<TranslationDTO>,
   addDate: Date
 }
 
@@ -394,22 +381,16 @@ MeaningDTO{
 }
 ```
 
-- `GET api/v1/users/{userId}/cards` - эндпоинт для получения списка карточек пользователя.
-
-  Принимает следующий параметр:
-
-  ```TypeScript
-  userId: string
-  ```
+- `GET api/v1/users/cards` - эндпоинт для получения списка карточек пользователя.
 
   Возможно установить следующие query parameters:
 
   ```TypeScript
   search: string,
-  page: number,
+  offset: number,
   limit: number,
-  filter: "all" | languageId,
-  sort: "date" | "word",
+  filter: languageId,
+  sortBy: "date" | "word",
   sortDirection: "asc" | "desc"
   ```
 
@@ -418,7 +399,7 @@ MeaningDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The user's cards have been received.",
+    numberOfRecords: number,
     cards: Array<UserCardDTO>
   }
   ```
@@ -426,22 +407,13 @@ MeaningDTO{
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
-  - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Invalid query parameter(s)."}
     ```
 
-- `POST api/v1/users/{userId}/cards` - эндпоинт для создания карточки пользователя.
-
-  Принимает следующий параметр:
-
-  ```TypeScript
-  userId: string
-  ```
+- `POST api/v1/users/cards` - эндпоинт для создания карточки пользователя.
 
   Ожидает следующее тело запроса:
 
@@ -464,7 +436,6 @@ MeaningDTO{
   ```TypeScript
   {
     statusCode: 201,
-    message: "The user card has been created.",
     card: UserCardDTO
   }
   ```
@@ -473,9 +444,6 @@ MeaningDTO{
 
   - ```TypeScript
      { statusCode: 422, message: "The card with the specified data has already been created."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
     ```
   - ```TypeScript
      { statusCode: 404, message: "Language(s) not found."}
@@ -496,80 +464,18 @@ MeaningDTO{
      { statusCode: 400, message: "The meanings array(s) contains invalid values."}
     ```
 
-- `POST api/v1/users/{userId}/cards/{cardId}/translations` - эндпоинт для добавления переводов слова в карточку пользователя.
+- `PUT api/v1/users/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
 
-  Принимает следующие параметры:
+  Принимает следующий параметр:
 
   ```TypeScript
-  userId: string,
   cardId: string
   ```
 
   Ожидает следующее тело запроса:
 
   ```TypeScript
-  {
-    translations: [
-     {
-       languageId: string,
-       meanings: string[]
-     }
-    ]
-  }
-  ```
-
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  {
-    statusCode: 201,
-    message: "The translation(s) were successfully added to the user's card.",
-    card: UserCardDTO
-  }
-  ```
-
-  Возможные ошибки:
-
-  - ```TypeScript
-     { statusCode: 422, message: "The card already contains a translation(s) into the specified language(s)."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "Card not found."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "Language(s) not found."}
-    ```
-  - ```TypeScript
-     { statusCode: 401, message: "Access token is missing or invalid."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "A valid array of translations was not received."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
-    ```
-
-- `PUT api/v1/users/{userId}/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
-
-  Принимает следующие параметры:
-
-  ```TypeScript
-  userId: string,
-  cardId: string
-  ```
-
-  Ожидает следующее тело запроса:
-
-  ```TypeScript
-  {
-    translations: Array<TranslationDTO>
-  }
+  { translations: Array<TranslationDTO> }
   ```
 
   Возвращает следующий DTO:
@@ -577,19 +483,12 @@ MeaningDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The user card has been updated.",
     card: UserCardDTO
   }
   ```
 
   Возможные ошибки:
 
-  - ```TypeScript
-     { statusCode: 422, message: "The card already contains a translation(s) into the specified language(s)."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
   - ```TypeScript
      { statusCode: 404, message: "Card not found."}
     ```
@@ -618,29 +517,22 @@ MeaningDTO{
      { statusCode: 400, message: "The meanings array(s) contains invalid values."}
     ```
 
-- `DELETE api/v1/users/{userId}/cards/{cardId}` - эндпоинт для удаления определенной карточки пользователя.
+- `DELETE api/v1/users/cards/{cardId}` - эндпоинт для удаления определенной карточки пользователя.
 
-  Принимает следующие параметры:
+  Принимает следующий параметр:
 
   ```TypeScript
-  userId: string,
   cardId: string
   ```
 
   Возвращает следующий DTO:
 
   ```TypeScript
-  {
-    statusCode: 200,
-    message: "The user card has been deleted."
-  }
+  { statusCode: 200 }
   ```
 
   Возможные ошибки:
 
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
   - ```TypeScript
      { statusCode: 404, message: "Card not found."}
     ```
@@ -653,7 +545,7 @@ MeaningDTO{
 ```TypeScript
 UserTaskDTO{
   id: string,
-  type: "to_base_lang" | "to_studied_lang",
+  type: "to_main_lang" | "to_studied_lang",
   answerStatus: string,
   hiddenWord: string,
   correctAnswers: string[],
@@ -662,23 +554,17 @@ UserTaskDTO{
 }
 ```
 
-- `GET api/v1/users/{userId}/tasks` - эндпоинт для получения списка заданий пользователя.
-
-  Принимает следующий параметр:
-
-  ```TypeScript
-  userId: string
-  ```
+- `GET api/v1/users/tasks` - эндпоинт для получения списка заданий пользователя.
 
   Возможно установить следующие query parameters:
 
   ```TypeScript
   search: string,
-  page: number,
+  offset: number,
   limit: number,
-  filterByLang: "all" | languageId,
-  filterByAnswerStatus: "all" | "unanswered" | "correct" | "incorrect",
-  sort: "date",
+  filterByLang: languageId,
+  filterByAnswerStatus: "unanswered" | "correct" | "incorrect",
+  sortBy: "date",
   sortDirection: "asc" | "desc"
   ```
 
@@ -687,7 +573,7 @@ UserTaskDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The list of user tasks was received.",
+    numberOfRecords: number,
     tasks: Array<UserTaskDTO>
   }
   ```
@@ -695,36 +581,20 @@ UserTaskDTO{
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
-  - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Invalid query parameter(s)."}
     ```
 
-- `POST api/v1/users/{userId}/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
-
-  Принимает следующий параметр:
-
-  ```TypeScript
-  userId: string
-  ```
+- `POST api/v1/users/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
 
   Возможно установить следующие query parameters:
 
   ```TypeScript
   fromDate: Date,
-  toDate: Date
-  ```
-
-  Ожидает следующее тело запроса:
-
-  ```TypeScript
-  {
-    languageIds: string[],
-  }
+  toDate: Date,
+  languageIds: string
   ```
 
   Возвращает следующий DTO:
@@ -732,12 +602,10 @@ UserTaskDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "Statistics on user answers to tasks were received.",
     statistics: [
      {
        language: LanguageDTO,
        answers: {
-         all: string,
          correct: string,
          incorrect: string
        }
@@ -749,32 +617,20 @@ UserTaskDTO{
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
-  - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Invalid query parameter(s)."}
     ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid array of language identifiers."}
-    ```
 
-- `POST api/v1/users/{userId}/tasks` - эндпоинт создания задания для пользователя.
-
-  Принимает следующий параметр:
-
-  ```TypeScript
-  userId: string
-  ```
+- `POST api/v1/users/tasks` - эндпоинт создания задания для пользователя.
 
   Ожидает следующее тело запроса:
 
   ```TypeScript
   {
     languageId: string,
-    type: "to_base_lang" | "to_studied_lang"
+    type: "to_main_lang" | "to_studied_lang"
   }
   ```
 
@@ -783,7 +639,6 @@ UserTaskDTO{
   ```TypeScript
   {
     statusCode: 201,
-    message: "The task has been created for the user.",
     task: {
       id: string,
       word: string
@@ -794,7 +649,7 @@ UserTaskDTO{
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 404, message: "User not found."}
+     { statusCode: 422, message: "The languageId must be different from the user's main languageId."}
     ```
   - ```TypeScript
      { statusCode: 404, message: "Language not found."}
@@ -803,24 +658,21 @@ UserTaskDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid type."}
+     { statusCode: 400, message: "Invalid task type."}
     ```
 
-- `PUT api/v1/users/{userId}/tasks/{taskId}` - эндпоинт для отправки ответа на задание.
+- `PUT api/v1/users/tasks/{taskId}` - эндпоинт для отправки ответа на задание.
 
   Принимает следующие параметры:
 
   ```TypeScript
-  userId: string,
   taskId: string
   ```
 
   Ожидает следующее тело запроса:
 
   ```TypeScript
-  {
-    answer: string
-  }
+  { answer: string }
   ```
 
   Возвращает следующий DTO:
@@ -828,16 +680,12 @@ UserTaskDTO{
   ```TypeScript
   {
     statusCode: 200,
-    message: "The answer to the task was recorded.",
     task: UserTaskDTO
   }
   ```
 
   Возможные ошибки:
 
-  - ```TypeScript
-     { statusCode: 404, message: "User not found."}
-    ```
   - ```TypeScript
      { statusCode: 404, message: "Task not found."}
     ```
