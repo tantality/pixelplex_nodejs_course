@@ -44,16 +44,16 @@ Id пользователя получается из accessToken.
 
 ```TypeScript
 AuthDTO{
-  id: string,
+  id: number,
   accessToken: string,
   refreshToken: string
 }
 
 UserDTO{
-  id: string,
+  id: number,
   name: string,
   email: string,
-  mainLanguageId: string
+  mainLanguageId: number
 }
 ```
 
@@ -66,7 +66,7 @@ UserDTO{
     name: string,
     password: string,
     email: string,
-    mainLanguageId: string
+    mainLanguageId: number
   }
   ```
 
@@ -176,7 +176,7 @@ UserDTO{
   {
     name: string,
     email: string,
-    mainLanguageId: string
+    mainLanguageId: number
   }
   ```
 
@@ -211,7 +211,7 @@ UserDTO{
 
 ```TypeScript
 LanguageDTO{
-  id: string,
+  id: number,
   name: string,
   code: string,
   dateAdded: Date
@@ -292,7 +292,7 @@ LanguageDTO{
   Принимает следующий параметр:
 
   ```TypeScript
-  languageId: string
+  languageId: number
   ```
 
   Ожидает следующее тело запроса:
@@ -339,7 +339,7 @@ LanguageDTO{
   Принимает следующий параметр:
 
   ```TypeScript
-  languageId: string
+  languageId: number
   ```
 
   Возвращает следующий DTO:
@@ -364,19 +364,19 @@ LanguageDTO{
 
 ```TypeScript
 UserCardDTO{
-  cardId: string,
+  cardId: number,
   translations: Array<TranslationDTO>,
   addDate: Date
 }
 
 TranslationDTO{
-  id: string,
-  languageId: string,
+  id: number,
+  languageId: number,
   meanings: Array<MeaningDTO>
 }
 
 MeaningDTO{
-  id: string,
+  id: number,
   name: string
 }
 ```
@@ -421,7 +421,7 @@ MeaningDTO{
   {
     translations: [
      {
-       languageId: string,
+       languageId: number,
        meanings: string[]
      }
     ]
@@ -469,7 +469,7 @@ MeaningDTO{
   Принимает следующий параметр:
 
   ```TypeScript
-  cardId: string
+  cardId: number
   ```
 
   Ожидает следующее тело запроса:
@@ -522,7 +522,7 @@ MeaningDTO{
   Принимает следующий параметр:
 
   ```TypeScript
-  cardId: string
+  cardId: number
   ```
 
   Возвращает следующий DTO:
@@ -544,7 +544,7 @@ MeaningDTO{
 
 ```TypeScript
 UserTaskDTO{
-  id: string,
+  id: number,
   type: "to_main_lang" | "to_studied_lang",
   answerStatus: string,
   hiddenWord: string,
@@ -629,7 +629,7 @@ UserTaskDTO{
 
   ```TypeScript
   {
-    languageId: string,
+    languageId: number,
     type: "to_main_lang" | "to_studied_lang"
   }
   ```
@@ -640,7 +640,7 @@ UserTaskDTO{
   {
     statusCode: 201,
     task: {
-      id: string,
+      id: number,
       word: string
     }
   }
@@ -666,7 +666,7 @@ UserTaskDTO{
   Принимает следующие параметры:
 
   ```TypeScript
-  taskId: string
+  taskId: number
   ```
 
   Ожидает следующее тело запроса:
