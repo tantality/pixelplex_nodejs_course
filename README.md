@@ -65,22 +65,15 @@
   updatedAt: Date
 }
 
-3. UserCard:
-{
-  userId: number,
-  cardId: numebr,
-  createdAt: Date,
-  updatedAt: Date
-}
-
-4. Card:
+3. Card:
 {
   id: number,
+  userId: number,
   createdAt: Date,
   updatedAt: Date
 }
 
-5. Translation:
+4. Translation:
 {
   id: number,
   languageId: number,
@@ -90,7 +83,7 @@
   updatedAt: Date
 }
 
-6. Meaning:
+5. Meaning:
 {
   id: number,
   name: string,
@@ -98,26 +91,19 @@
   updatedAt: Date
 }
 
-7. UserTask:
-{
-  userId: number,
-  taskId: number,
-  createdAt: Date,
-  updatedAt: Date
-}
-
-8. Task:
+6. Task:
 {
   id: number,
+  userId: number,
+  hiddenWordId: number,
   type: string,
   answerStatus: string,
-  hiddenWordId: number,
   receivedAnswer: string,
   createdAt: Date,
   updatedAt: Date
 }
 
-9. TaskCorrectAnswer:
+7. TaskTranslation:
 {
   taskId: number,
   translationId: number,
@@ -132,33 +118,27 @@
 1. Language - User: one-to-many relation
 Language.id(PK) - User.mainLanguageId(FK)
 
-2. User - UserCard: one-to-many relation
-User.id(PK) - UserCard.userId(FK)
+2. User - Card: one-to-many relation
+User.id(PK) - Card.userId(FK)
 
-3. Card - UserCard: one-to-many relation
-Card.id(PK) - UserCard.cardId(FK)
-
-4. Card - Translation: one-to-many relation
+3. Card - Translation: one-to-many relation
 Card.id(PK) - Translation.cardId(FK)
 
-5. Language - Translation: one-to-many relation
+4. Language - Translation: one-to-many relation
 Language.id(PK) - Translation.languageId(FK)
 
-6. Translation - Meaning: one-to-many relation
+5. Translation - Meaning: one-to-many relation
 Meaning.id(PK) - Translation.meaningId(FK)
 
-7. User - UserTask: one-to-many relation
-User.id(PK) - UserTask.userId(FK)
+6. User - Task: one-to-many relation
+User.id(PK) - Task.userId(FK)
 
-8. Task - UserTask: one-to-many relation
-Task.id(PK) - UserTask.taskId(FK)
-
-9. Translation - Task: one-to-many relation
+7. Translation - Task: one-to-many relation
 Translation.id(PK) - Task.hiddenWordId(FK)
 
-10. Task - TaskCorrectAnswer: one-to-many relation
-Task.id(PK) - TaskCorrectAnswer.taskId(FK)
+8. Task - TaskTranslation: one-to-many relation
+Task.id(PK) - TaskTranslation.taskId(FK)
 
-11. Translation - TaskCorrectAnswer: one-to-many relation
-Translation.id(PK) - TaskCorrectAnswer.translationId(FK)
+9. Translation - TaskTranslation: one-to-many relation
+Translation.id(PK) - TaskTranslation.translationId(FK)
 ```
