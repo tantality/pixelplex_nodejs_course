@@ -91,7 +91,7 @@ UserDTO{
      { statusCode: 404, message: "Language not found."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid e-mail."}
+     { statusCode: 400, message: "Invalid email."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Invalid name."}
@@ -168,16 +168,12 @@ UserDTO{
 
 ### Users
 
-- `PUT api/v1/users` - эндпоинт для редактирования данных пользователя.
+- `PATCH api/v1/users` - эндпоинт для редактирования данных пользователя.
 
   Ожидает следующее тело запроса:
 
   ```TypeScript
-  {
-    name: string,
-    email: string,
-    mainLanguageId: number
-  }
+  { mainLanguageId: number }
   ```
 
   Возвращает следующий DTO:
@@ -192,19 +188,10 @@ UserDTO{
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 422, message: "The user with the specified email already exists."}
-    ```
-  - ```TypeScript
      { statusCode: 404, message: "Language not found."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid e-mail."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid name."}
     ```
 
 ### Languages
