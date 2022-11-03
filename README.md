@@ -48,7 +48,8 @@
   id: number,
   name: string,
   code: string,
-  addDate: Date
+  createdAt: Date,
+  updatedAt: Date
 }
 
 2. User:
@@ -59,19 +60,24 @@
   email: string,
   password: string,
   role: string,
-  refreshToken: string
+  refreshToken: string,
+  createdAt: Date,
+  updatedAt: Date
 }
 
 3. UserCard:
 {
   userId: number,
-  cardId: numebr
+  cardId: numebr,
+  createdAt: Date,
+  updatedAt: Date
 }
 
 4. Card:
 {
   id: number,
-  addDate: Date
+  createdAt: Date,
+  updatedAt: Date
 }
 
 5. Translation:
@@ -79,19 +85,25 @@
   id: number,
   languageId: number,
   meaningId: number,
-  cardId: number
+  cardId: number,
+  createdAt: Date,
+  updatedAt: Date
 }
 
 6. Meaning:
 {
   id: number,
-  name: string
+  name: string,
+  createdAt: Date,
+  updatedAt: Date
 }
 
 7. UserTask:
 {
   userId: number,
-  taskId: number
+  taskId: number,
+  createdAt: Date,
+  updatedAt: Date
 }
 
 8. Task:
@@ -101,13 +113,16 @@
   answerStatus: string,
   hiddenWordId: number,
   receivedAnswer: string,
-  addDate: Date
+  createdAt: Date,
+  updatedAt: Date
 }
 
 9. TaskCorrectAnswer:
 {
   taskId: number,
-  translationId: number
+  translationId: number,
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
 
