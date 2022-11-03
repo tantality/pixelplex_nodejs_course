@@ -129,7 +129,7 @@ UserDTO{
      { statusCode: 404, message: "The user with the specified email does not exist."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Incorrect password."}
+     { statusCode: 400, message: "Invalid password."}
     ```
 
 - `GET api/v1/auth/log-out` - эндпоинт для выхода пользователя из системы.
