@@ -87,13 +87,7 @@ UserDTO{
      { statusCode: 400, message: "The user with the specified email already exists."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid email."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid name."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid password."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/auth/log-in` - эндпоинт для логина пользователя.
@@ -124,7 +118,7 @@ UserDTO{
      { statusCode: 404, message: "The user with the specified email does not exist."}
     ```
   - ```TypeScript
-     { statusCode: 401, message: "Invalid password."}
+     { statusCode: 401, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/auth/refresh-tokens` - эндпоинт для обнолвления токенов пользователя.
@@ -223,7 +217,7 @@ LanguageDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid query parameter(s)."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `GET api/v1/languages/{languageId}` - эндпоинт для получения информации по определенному языку.
@@ -278,10 +272,7 @@ LanguageDTO{
      { statusCode: 400, message: "The language with the specified code already exists."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid code."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid name."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `PUT api/v1/languages/{languageId}` - эндпоинт для обновления определенного языка.
@@ -322,10 +313,7 @@ LanguageDTO{
      { statusCode: 400, message: "The language with the specified code already exists."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid code."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Invalid name."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `DELETE api/v1/languages/{languageId}` - эндпоинт для удаления определенного языка.
@@ -403,7 +391,7 @@ MeaningDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid query parameter(s)."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/cards` - эндпоинт для создания карточки пользователя.
@@ -442,19 +430,13 @@ MeaningDTO{
      { statusCode: 400, message: "The card with the specified data has already been created."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The translations array containing at least 2 elements was not received."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
-    ```
-  - ```TypeScript
      { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
+     { statusCode: 400, message: "Translation(s) into the specified languages is/are not contained in the card."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Translation(s) into the specified languages is/are not contained in the card."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `PUT api/v1/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
@@ -495,16 +477,10 @@ MeaningDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "A valid array of translations was not received."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "The elements of the translations array must contain unique language identifiers."}
-    ```
-  - ```TypeScript
      { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
     ```
-  - ```TypeScript
-     { statusCode: 400, message: "The meanings array(s) contains invalid values."}
+    - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `DELETE api/v1/cards/{cardId}` - эндпоинт для удаления определенной карточки пользователя.
@@ -573,7 +549,7 @@ TaskDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid query parameter(s)."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
@@ -608,7 +584,7 @@ TaskDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid query parameter(s)."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/tasks` - эндпоинт создания задания для пользователя.
@@ -647,7 +623,7 @@ TaskDTO{
      { statusCode: 400, message: "The languageId must be different from the user's main languageId."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "Invalid task type."}
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/tasks/{taskId}/answer` - эндпоинт для отправки ответа на задание.
