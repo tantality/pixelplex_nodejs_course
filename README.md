@@ -96,14 +96,6 @@
   createdAt: Date,
   updatedAt: Date
 }
-
-6. TaskWord:
-{
-  taskId: number,
-  wordId: number,
-  createdAt: Date,
-  updatedAt: Date
-}
 ```
 
 ## Relations
@@ -127,15 +119,9 @@ Language.id(PK) - Card.foreignLanguageId(FK)
 6. Language - Word: one-to-many relation
 Language.id(PK) - Word.languageId(FK)
 
-7. Word - TaskWord: one-to-many relation
-Word.id(PK) - TaskWord.wordId(FK)
-
-8. Word - Task: one-to-many relation
+7. Word - Task: one-to-many relation
 Word.id(PK) - Task.hiddenWordId(FK)
 
-9. Task - TaskWord: one-to-many relation
-Task.id(PK) - TaskWord.taskId(FK)
-
-10. User - Task: one-to-many relation
+8. User - Task: one-to-many relation
 User.id(PK) - Task.userId(FK)
 ```
