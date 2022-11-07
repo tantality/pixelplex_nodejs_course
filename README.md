@@ -55,7 +55,7 @@
 2. User:
 {
   id: number,
-  mainLanguageId: number,
+  nativeLanguageId: number,
   name: string,
   email: string,
   password: string,
@@ -69,29 +69,23 @@
 {
   id: number,
   userId: number,
+  nativeLanguageId: number,
+  foreignLanguageId: number,
   createdAt: Date,
   updatedAt: Date
 }
 
-4. Translation:
+4. Word: 
 {
   id: number,
   languageId: number,
-  meaningId: number,
   cardId: number,
+  value: string,
   createdAt: Date,
   updatedAt: Date
 }
 
-5. Meaning:
-{
-  id: number,
-  name: string,
-  createdAt: Date,
-  updatedAt: Date
-}
-
-6. Task:
+5. Task:
 {
   id: number,
   userId: number,
@@ -103,10 +97,10 @@
   updatedAt: Date
 }
 
-7. TaskTranslation:
+6. TaskWord:
 {
   taskId: number,
-  translationId: number,
+  wordId: number,
   createdAt: Date,
   updatedAt: Date
 }
@@ -116,29 +110,32 @@
 
 ```TypeScript
 1. Language - User: one-to-many relation
-Language.id(PK) - User.mainLanguageId(FK)
+Language.id(PK) - User.nativeLanguageId(FK)
 
 2. User - Card: one-to-many relation
 User.id(PK) - Card.userId(FK)
 
-3. Card - Translation: one-to-many relation
-Card.id(PK) - Translation.cardId(FK)
+3. Card - Word: one-to-many relation
+Card.id(PK) - Word.cardId(FK)
 
-4. Language - Translation: one-to-many relation
-Language.id(PK) - Translation.languageId(FK)
+4. Language - Card: one-to-many relation
+Language.id(PK) - Card.nativeLanguageId(FK)
 
-5. Translation - Meaning: one-to-many relation
-Meaning.id(PK) - Translation.meaningId(FK)
+5. Language - Card: one-to-many relation
+Language.id(PK) - Card.foreignLanguageId(FK)
 
-6. User - Task: one-to-many relation
+6. Language - Word: one-to-many relation
+Language.id(PK) - Word.languageId(FK)
+
+7. Word - TaskWord: one-to-many relation
+Word.id(PK) - TaskWord.wordId(FK)
+
+8. Word - Task: one-to-many relation
+Word.id(PK) - Task.hiddenWordId(FK)
+
+9. Task - TaskWord: one-to-many relation
+Task.id(PK) - TaskWord.taskId(FK)
+
+10. User - Task: one-to-many relation
 User.id(PK) - Task.userId(FK)
-
-7. Translation - Task: one-to-many relation
-Translation.id(PK) - Task.hiddenWordId(FK)
-
-8. Task - TaskTranslation: one-to-many relation
-Task.id(PK) - TaskTranslation.taskId(FK)
-
-9. Translation - TaskTranslation: one-to-many relation
-Translation.id(PK) - TaskTranslation.translationId(FK)
 ```
