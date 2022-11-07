@@ -75,7 +75,7 @@
   updatedAt: Date
 }
 
-4. Word: 
+4. Word:
 {
   id: number,
   languageId: number,
@@ -92,7 +92,8 @@
   hiddenWordId: number,
   type: string,
   answerStatus: string,
-  receivedAnswer: string,
+  correctAnswers: string[],
+  receivedAnswer: string | null,
   createdAt: Date,
   updatedAt: Date
 }
