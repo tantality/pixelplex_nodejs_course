@@ -55,7 +55,7 @@ UserDTO{
   id: number,
   name: string,
   email: string,
-  mainLanguageId: number
+  nativeLanguageId: number
 }
 ```
 
@@ -68,15 +68,11 @@ UserDTO{
     name: string,
     password: string,
     email: string,
-    mainLanguageId: number
+    nativeLanguageId: number
   }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { auth: { ...AuthDTO } }
-  ```
+  Возвращает `AuthDTO`
 
   Возможные ошибки:
 
@@ -101,16 +97,7 @@ UserDTO{
   }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  {
-    user: {
-    ...AuthDTO,
-    ...UserDTO
-   }
-  }
-  ```
+  Возвращает `AuthDTO`
 
   Возможные ошибки:
 
@@ -118,21 +105,15 @@ UserDTO{
      { statusCode: 404, message: "The user with the specified email does not exist."}
     ```
   - ```TypeScript
-     { statusCode: 401, message: "Validation error(s)."}
+     { statusCode: 401, message: "Invalid password."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 - `POST api/v1/auth/refresh-tokens` - эндпоинт для обнолвления токенов пользователя.
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  {
-    user: {
-     ...UserDTO,
-     ...AuthDTO
-    }
-  }
-  ```
+  Возвращает `AuthDTO`
 
   Возможная ошибка:
 
@@ -154,6 +135,16 @@ UserDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
 
+- `GET api/v1/auth/me` - эндпоинт для получения данных пользоватлея.
+
+  Возвращает `UserDTO`
+
+  Возможная ошибка:
+
+  - ```TypeScript
+     { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+
 ### Users
 
 - `PATCH api/v1/users` - эндпоинт для редактирования данных пользователя.
@@ -161,14 +152,10 @@ UserDTO{
   Ожидает следующее тело запроса:
 
   ```TypeScript
-  { mainLanguageId: number }
+  { nativeLanguageId: number }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { user: UserDTO }
-  ```
+  Возвращает `UserDTO`
 
   Возможные ошибки:
 
@@ -228,11 +215,7 @@ LanguageDTO{
   languageId: number
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { language: LanguageDTO }
-  ```
+  Возвращает `LanguageDTO`
 
   Возможные ошибки:
 
@@ -254,11 +237,7 @@ LanguageDTO{
   }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { language: LanguageDTO }
-  ```
+  Возвращает `LanguageDTO`
 
   Возможные ошибки:
 
@@ -292,11 +271,7 @@ LanguageDTO{
   }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { language: LanguageDTO }
-  ```
+  Возвращает `LanguageDTO`
 
   Возможные ошибки:
 
@@ -327,7 +302,7 @@ LanguageDTO{
   Возвращает следующий DTO:
 
   ```TypeScript
-  { languageId: number }
+  { id: number }
   ```
 
   Возможные ошибки:
@@ -347,19 +322,16 @@ LanguageDTO{
 ```TypeScript
 CardDTO{
   id: number,
-  translations: Array<TranslationDTO>,
+  nativeLanguageId: number,
+  nativeMeanings: Array<MeaningDTO>,
+  foreignLanguageId: number,
+  foreignMeanings: Array<MeaningDTO>,
   createdAt: Date
-}
-
-TranslationDTO{
-  id: number,
-  languageId: number,
-  meanings: Array<MeaningDTO>
 }
 
 MeaningDTO{
   id: number,
-  name: string
+  value: string
 }
 ```
 
@@ -400,28 +372,20 @@ MeaningDTO{
 
   ```TypeScript
   {
-    translations: [
-     {
-       languageId: number,
-       meanings: string[]
-     }
-    ]
+    nativeMeanings: string[],
+    foreignLanguageId: number,
+    foreignMeanings: string[]
   }
 
-   Массив translations должен содержать минимум 2 перевода.
-   Если languageId совпадает с mainLanguageId пользователя, то в массив meanings можно добавить только одно значение.
+  В массивы meanings можно добавить не более 3 значений.
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { card: CardDTO }
-  ```
+  Возвращает `CardDTO`
 
   Возможные ошибки:
 
   - ```TypeScript
-     { statusCode: 404, message: "Language(s) not found."}
+     { statusCode: 404, message: "Language not found."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
@@ -430,16 +394,10 @@ MeaningDTO{
      { statusCode: 400, message: "The card with the specified data has already been created."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
-    ```
-  - ```TypeScript
-     { statusCode: 400, message: "Translation(s) into the specified languages is/are not contained in the card."}
-    ```
-  - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
-- `PUT api/v1/cards/{cardId}` - эндпоинт для обновления переводов определенной карточки пользователя.
+- `PATCH api/v1/cards/{cardId}` - эндпоинт для обновления карточки пользователя.
 
   Принимает следующий параметр:
 
@@ -450,14 +408,14 @@ MeaningDTO{
   Ожидает следующее тело запроса:
 
   ```TypeScript
-  { translations: Array<TranslationDTO> }
+  {
+    nativeMeanings: Array<MeaningDTO>,
+    foreignLanguageId: number,
+    foreignMeanings: Array<MeaningDTO>,
+  }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { card: CardDTO }
-  ```
+  Возвращает `CardDTO`
 
   Возможные ошибки:
 
@@ -465,10 +423,7 @@ MeaningDTO{
      { statusCode: 404, message: "Card not found."}
     ```
   - ```TypeScript
-     { statusCode: 404, message: "Language(s) not found."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "Translation(s) not found."}
+     { statusCode: 404, message: "Language not found."}
     ```
   - ```TypeScript
      { statusCode: 404, message: "Meaning(s) not found."}
@@ -477,9 +432,6 @@ MeaningDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The meanings array containing a single value for the main language was not passed."}
-    ```
-    - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
@@ -494,7 +446,7 @@ MeaningDTO{
   Возвращает следующий DTO:
 
   ```TypeScript
-  { cardId: number }
+  { id: number }
   ```
 
   Возможные ошибки:
@@ -511,11 +463,13 @@ MeaningDTO{
 ```TypeScript
 TaskDTO{
   id: number,
-  type: "to_main_lang" | "to_studied_lang",
-  answerStatus: string,
+  nativeLanguageId: number,
+  foreignLanguageId: number,
+  type: "to_native" | "to_foreign",
+  answerStatus: "unanswered" | "correct" | "incorrect",
   hiddenWordId: number,
-  correctAnswers: string[],
-  receivedAnswer: string,
+  correctAnswers?: string[],
+  receivedAnswer?: string,
   createdAt: Date
 }
 ```
@@ -570,8 +524,8 @@ TaskDTO{
      {
        language: LanguageDTO,
        answers: {
-         correct: string,
-         incorrect: string
+         correct: number,
+         incorrect: number
        }
      }
     ]
@@ -593,8 +547,8 @@ TaskDTO{
 
   ```TypeScript
   {
-    languageId: number,
-    type: "to_main_lang" | "to_studied_lang"
+    foreignLanguageId: number,
+    type: "to_native" | "to_foreign"
   }
   ```
 
@@ -602,12 +556,11 @@ TaskDTO{
 
   ```TypeScript
   {
-    task: {
-      id: number,
-      languageId: number,
-      word: string,
-      type: "to_main_lang" | "to_studied_lang",
-    }
+    id: number,
+    nativeLanguageId: number,
+    foreignLanguageId: number,
+    word: string,
+    type: "to_native" | "to_foreign",
   }
   ```
 
@@ -620,7 +573,10 @@ TaskDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The languageId must be different from the user's main languageId."}
+     { statusCode: 400, message: "ForeignLanguageId must be different from the user's nativeLanguageId."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "No cards were created for the specified language."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
@@ -640,11 +596,7 @@ TaskDTO{
   { answer: string }
   ```
 
-  Возвращает следующий DTO:
-
-  ```TypeScript
-  { task: TaskDTO }
-  ```
+  Возвращает `TaskDTO`
 
   Возможные ошибки:
 
