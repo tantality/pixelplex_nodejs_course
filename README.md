@@ -184,9 +184,9 @@ LanguageDTO{
   ```TypeScript
   search?: string,
   offset: number,
-  limit: number,
-  sortBy: "date" | "name",
-  sortDirection: "asc" | "desc"
+  limit: number = 20,
+  sortBy: "date" | "name" = "date",
+  sortDirection: "asc" | "desc" = "asc"
   ```
 
   Возвращает следующий DTO:
@@ -342,10 +342,10 @@ MeaningDTO{
   ```TypeScript
   search?: string,
   offset: number,
-  limit: number,
+  limit: number = 20,
   languageId: number,
-  sortBy: "date" | "word",
-  sortDirection: "asc" | "desc"
+  sortBy: "date" | "word" = "date",
+  sortDirection: "asc" | "desc" = "asc"
   ```
 
   Возвращает следующий DTO:
@@ -481,11 +481,11 @@ TaskDTO{
   ```TypeScript
   search?: string,
   offset: number,
-  limit: number,
+  limit: number = 20,
   languageId: number,
   taskStatus: "unanswered" | "correct" | "incorrect",
-  sortBy: "date",
-  sortDirection: "asc" | "desc"
+  sortBy: "date" = "date",
+  sortDirection: "asc" | "desc" = "asc"
   ```
 
   Возвращает следующий DTO:
