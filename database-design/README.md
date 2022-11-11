@@ -53,7 +53,7 @@
   hiddenWordId: number,
   type: string,
   answerStatus: string,
-  correctAnswers: string[],
+  correctAnswers: string[] | null,
   receivedAnswer: string | null,
   createdAt: Date,
   updatedAt: Date
