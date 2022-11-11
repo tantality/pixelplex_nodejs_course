@@ -18,6 +18,7 @@
   nativeLanguageId: number,
   name: string,
   email: string,
+  normalizedEmail: string,
   password: string,
   role: string,
   refreshToken: string,
