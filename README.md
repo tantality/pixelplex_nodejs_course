@@ -316,6 +316,9 @@ LanguageDTO{
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
+    ```
 
 ### Cards
 
@@ -456,6 +459,9 @@ MeaningDTO{
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
     ```
 
 ### Tasks
