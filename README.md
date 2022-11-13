@@ -165,6 +165,9 @@ UserDTO{
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
+    ```
 
 ### Languages
 
@@ -257,7 +260,7 @@ LanguageDTO{
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
-- `PUT api/v1/languages/{languageId}` - эндпоинт для обновления определенного языка.
+- `PATCH api/v1/languages/{languageId}` - эндпоинт для обновления определенного языка.
 
   Принимает следующий параметр:
 
@@ -400,6 +403,9 @@ MeaningDTO{
      { statusCode: 400, message: "The card with the specified data has already been created."}
     ```
   - ```TypeScript
+     { statusCode: 400, message: "ForeignLanguageId must be different from the user's nativeLanguageId."}
+    ```
+  - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
@@ -436,6 +442,9 @@ MeaningDTO{
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "ForeignLanguageId must be different from the user's nativeLanguageId."}
     ```
   - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
@@ -515,7 +524,7 @@ TaskDTO{
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
-- `POST api/v1/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
+- `GET api/v1/tasks/statistics` - эндпоинт для получения статистики ответов на задания пользователя.
 
   Возможно установить следующие query parameters:
 
