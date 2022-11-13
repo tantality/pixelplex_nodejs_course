@@ -225,6 +225,9 @@ LanguageDTO{
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
+    ```
 
 - `POST api/v1/languages` - эндпоинт для создания языка.
 
@@ -611,4 +614,7 @@ TaskDTO{
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
+    ```
+  - ```TypeScript
+     { statusCode: 400, message: "Validation error(s)."}
     ```
