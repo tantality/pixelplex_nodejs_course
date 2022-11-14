@@ -2,54 +2,54 @@ CREATE TABLE languages (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   code VARCHAR(255) UNIQUE NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  createdAt TIMESTAMP NOT NULL,
+  updatedAt TIMESTAMP NOT NULL
 );
 
-CREATE TYPE user_role AS ENUM ('user', 'admin');
+CREATE TYPE userRole AS ENUM ('user', 'admin');
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  native_language_id INTEGER REFERENCES languages (id) ON DELETE CASCADE, 
+  nativeLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE, 
   name VARCHAR(257) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  normalized_email VARCHAR(255) UNIQUE NOT NULL,
+  normalizedEmail VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role user_role DEFAULT 'user' NOT NULL,
-  refresh_token VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  role userRole DEFAULT 'user' NOT NULL,
+  refreshToken VARCHAR(255) NOT NULL,
+  createdAt TIMESTAMP NOT NULL,
+  updatedAt TIMESTAMP NOT NULL
 );
 
 CREATE TABLE cards (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
-  native_language_id INTEGER REFERENCES languages (id) ON DELETE CASCADE,
-  foreign_language_id INTEGER REFERENCES languages (id) ON DELETE CASCADE,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  userId INTEGER REFERENCES users (id) ON DELETE CASCADE,
+  nativeLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
+  foreignLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
+  createdAt TIMESTAMP NOT NULL,
+  updatedAt TIMESTAMP NOT NULL
 );
 
 CREATE TABLE words (
   id SERIAL PRIMARY KEY,
-  language_id INTEGER REFERENCES languages (id) ON DELETE CASCADE,
-  card_id INTEGER REFERENCES cards (id) ON DELETE CASCADE,
+  languageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
+  cardId INTEGER REFERENCES cards (id) ON DELETE CASCADE,
   value VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  createdAt TIMESTAMP NOT NULL,
+  updatedAt TIMESTAMP NOT NULL
 );
 
-CREATE TYPE task_type AS ENUM ('to_native', 'to_foreign');
-CREATE TYPE task_answer_status AS ENUM ('unanswered', 'correct', 'incorrect');
+CREATE TYPE taskType AS ENUM ('to_native', 'to_foreign');
+CREATE TYPE taskAnswerStatus AS ENUM ('unanswered', 'correct', 'incorrect');
 
 CREATE TABLE tasks (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
-  hidden_word_id INTEGER REFERENCES words (id) ON DELETE CASCADE,
-  type task_type NOT NULL,
-  answer_status task_answer_status DEFAULT 'unanswered' NOT NULL,
-  correct_answers VARCHAR(255)[],
-  received_answer VARCHAR(255),
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  userId INTEGER REFERENCES users (id) ON DELETE CASCADE,
+  hiddenWordId INTEGER REFERENCES words (id) ON DELETE CASCADE,
+  type taskType NOT NULL,
+  answerStatus taskAnswerStatus DEFAULT 'unanswered' NOT NULL,
+  correctAnswers VARCHAR(255)[],
+  receivedAnswer VARCHAR(255),
+  createdAt TIMESTAMP NOT NULL,
+  updatedAt TIMESTAMP NOT NULL
 );
