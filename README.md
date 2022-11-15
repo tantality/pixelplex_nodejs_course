@@ -323,6 +323,9 @@ LanguageDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
+     { statusCode: 400, message: "The language cannot be deleted because it is used in the card(s) or/and is set as the user's native language."}
+    ```
+  - ```TypeScript
      { statusCode: 400, message: "Validation error(s)."}
     ```
 
@@ -400,9 +403,6 @@ MeaningDTO{
      { statusCode: 401, message: "Access token is missing or invalid."}
     ```
   - ```TypeScript
-     { statusCode: 400, message: "The card with the specified data has already been created."}
-    ```
-  - ```TypeScript
      { statusCode: 400, message: "ForeignLanguageId must be different from the user's nativeLanguageId."}
     ```
   - ```TypeScript
@@ -421,9 +421,9 @@ MeaningDTO{
 
   ```TypeScript
   {
-    nativeMeanings: Array<MeaningDTO>,
-    foreignLanguageId: number,
-    foreignMeanings: Array<MeaningDTO>,
+    nativeMeanings?: string[],
+    foreignLanguageId?: number,
+    foreignMeanings?: string[]
   }
   ```
 
@@ -436,9 +436,6 @@ MeaningDTO{
     ```
   - ```TypeScript
      { statusCode: 404, message: "Language not found."}
-    ```
-  - ```TypeScript
-     { statusCode: 404, message: "Meaning(s) not found."}
     ```
   - ```TypeScript
      { statusCode: 401, message: "Access token is missing or invalid."}
