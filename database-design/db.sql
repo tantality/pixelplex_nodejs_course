@@ -12,7 +12,7 @@ CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   nativeLanguageId INTEGER REFERENCES languages (id), 
   name VARCHAR(257) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) NOT NULL,
   normalizedEmail VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   role USER_ROLE DEFAULT 'user' NOT NULL,
