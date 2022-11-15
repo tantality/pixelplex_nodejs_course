@@ -10,7 +10,7 @@ CREATE TYPE userRole AS ENUM ('user', 'admin');
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  nativeLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE, 
+  nativeLanguageId INTEGER REFERENCES languages (id), 
   name VARCHAR(257) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   normalizedEmail VARCHAR(255) UNIQUE NOT NULL,
@@ -24,15 +24,15 @@ CREATE TABLE users (
 CREATE TABLE cards (
   id SERIAL PRIMARY KEY,
   userId INTEGER REFERENCES users (id) ON DELETE CASCADE,
-  nativeLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
-  foreignLanguageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
+  nativeLanguageId INTEGER REFERENCES languages (id),
+  foreignLanguageId INTEGER REFERENCES languages (id),
   createdAt TIMESTAMP NOT NULL,
   updatedAt TIMESTAMP NOT NULL
 );
 
 CREATE TABLE words (
   id SERIAL PRIMARY KEY,
-  languageId INTEGER REFERENCES languages (id) ON DELETE CASCADE,
+  languageId INTEGER REFERENCES languages (id),
   cardId INTEGER REFERENCES cards (id) ON DELETE CASCADE,
   value VARCHAR(255) NOT NULL,
   createdAt TIMESTAMP NOT NULL,
