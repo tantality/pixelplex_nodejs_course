@@ -272,8 +272,8 @@ LanguageDTO{
 
   ```TypeScript
   {
-    name: string,
-    code: string
+    name?: string,
+    code?: string
   }
   ```
 
@@ -529,8 +529,8 @@ TaskDTO{
   Возможно установить следующие query parameters:
 
   ```TypeScript
-  fromDate: Date,
-  toDate: Date,
+  fromDate?: Date,
+  toDate?: Date,
   languageIds: number[]
   ```
 
