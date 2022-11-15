@@ -335,13 +335,13 @@ LanguageDTO{
 CardDTO{
   id: number,
   nativeLanguageId: number,
-  nativeMeanings: Array<MeaningDTO>,
+  nativeWords: Array<WordDTO>,
   foreignLanguageId: number,
-  foreignMeanings: Array<MeaningDTO>,
+  foreignWords: Array<WordDTO>,
   createdAt: Date
 }
 
-MeaningDTO{
+WordDTO{
   id: number,
   value: string
 }
@@ -384,12 +384,12 @@ MeaningDTO{
 
   ```TypeScript
   {
-    nativeMeanings: string[],
+    nativeWords: string[],
     foreignLanguageId: number,
-    foreignMeanings: string[]
+    foreignWords: string[]
   }
 
-  В массивы meanings можно добавить не более 3 значений.
+  В массивы words можно добавить не более 3 значений.
   ```
 
   Возвращает `CardDTO`
@@ -421,9 +421,9 @@ MeaningDTO{
 
   ```TypeScript
   {
-    nativeMeanings?: string[],
+    nativeWords?: string[],
     foreignLanguageId?: number,
-    foreignMeanings?: string[]
+    foreignWords?: string[]
   }
   ```
 
