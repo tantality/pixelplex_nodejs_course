@@ -6,7 +6,7 @@ CREATE TABLE languages (
   updatedAt TIMESTAMP NOT NULL
 );
 
-CREATE TYPE userRole AS ENUM ('user', 'admin');
+CREATE TYPE USER_ROLE AS ENUM ('user', 'admin');
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -15,7 +15,7 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   normalizedEmail VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role userRole DEFAULT 'user' NOT NULL,
+  role USER_ROLE DEFAULT 'user' NOT NULL,
   refreshToken VARCHAR(255) NOT NULL,
   createdAt TIMESTAMP NOT NULL,
   updatedAt TIMESTAMP NOT NULL
@@ -39,15 +39,15 @@ CREATE TABLE words (
   updatedAt TIMESTAMP NOT NULL
 );
 
-CREATE TYPE taskType AS ENUM ('to_native', 'to_foreign');
-CREATE TYPE taskAnswerStatus AS ENUM ('unanswered', 'correct', 'incorrect');
+CREATE TYPE TASK_TYPE AS ENUM ('to_native', 'to_foreign');
+CREATE TYPE TASK_ANSWER_STATUS AS ENUM ('unanswered', 'correct', 'incorrect');
 
 CREATE TABLE tasks (
   id SERIAL PRIMARY KEY,
   userId INTEGER REFERENCES users (id) ON DELETE CASCADE,
   hiddenWordId INTEGER REFERENCES words (id) ON DELETE CASCADE,
-  type taskType NOT NULL,
-  answerStatus taskAnswerStatus DEFAULT 'unanswered' NOT NULL,
+  type TASK_TYPE NOT NULL,
+  answerStatus TASK_ANSWER_STATUS DEFAULT 'unanswered' NOT NULL,
   correctAnswers VARCHAR(255)[],
   receivedAnswer VARCHAR(255),
   createdAt TIMESTAMP NOT NULL,
