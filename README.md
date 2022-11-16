@@ -481,7 +481,7 @@ TaskDTO{
   nativeLanguageId: number,
   foreignLanguageId: number,
   type: "to_native" | "to_foreign",
-  answerStatus: "unanswered" | "correct" | "incorrect",
+  status: "unanswered" | "correct" | "incorrect",
   hiddenWordId: number,
   correctAnswers?: string[],
   receivedAnswer?: string,
