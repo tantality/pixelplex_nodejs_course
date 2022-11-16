@@ -40,14 +40,14 @@ CREATE TABLE words (
 );
 
 CREATE TYPE TASK_TYPE AS ENUM ('to_native', 'to_foreign');
-CREATE TYPE TASK_ANSWER_STATUS AS ENUM ('unanswered', 'correct', 'incorrect');
+CREATE TYPE TASK_STATUS AS ENUM ('unanswered', 'correct', 'incorrect');
 
 CREATE TABLE tasks (
   id SERIAL PRIMARY KEY,
   userId INTEGER REFERENCES users (id) ON DELETE CASCADE,
   hiddenWordId INTEGER REFERENCES words (id) ON DELETE CASCADE,
   type TASK_TYPE NOT NULL,
-  answerStatus TASK_ANSWER_STATUS DEFAULT 'unanswered' NOT NULL,
+  answerStatus TASK_STATUS DEFAULT 'unanswered' NOT NULL,
   correctAnswers VARCHAR(255)[],
   receivedAnswer VARCHAR(255),
   createdAt TIMESTAMP NOT NULL,
