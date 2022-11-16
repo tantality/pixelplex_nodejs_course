@@ -52,7 +52,7 @@
   userId: number,
   hiddenWordId: number,
   type: string,
-  answerStatus: string,
+  status: string,
   correctAnswers: string[] | null,
   receivedAnswer: string | null,
   createdAt: Date,
