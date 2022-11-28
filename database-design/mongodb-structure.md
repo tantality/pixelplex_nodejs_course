@@ -80,7 +80,10 @@ const taskSchema = new mongoose.Schema({
   nativeLanguageId: { ref: 'language', type: mongoose.Schema.Types.ObjectId, required: true },
   foreignLanguageId: { ref: 'language', type: mongoose.Schema.Types.ObjectId, required: true },
   type: { type: String, enum: [TASK_TYPE.TO_NATIVE, TASK_TYPE.TO_FOREIGN], required: true },
-  status: { type: String, enum: [TASK_STATUS.UNANSWERED, TASK_STATUS.CORRECT, TASK_STATUS.INCORRECT], default: TASK_STATUS.UNANSWERED, index: true, required: true },
+  status: { 
+    type: String, enum: [TASK_STATUS.UNANSWERED, TASK_STATUS.CORRECT, TASK_STATUS.INCORRECT], default: TASK_STATUS.UNANSWERED, 
+    index: true, required: true 
+  },
   correctAnswers: { type: [String], default: null },
   receivedAnswer: { type: String, default: null },
 }, { timestamps: true });
