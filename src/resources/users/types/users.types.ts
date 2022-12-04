@@ -6,7 +6,7 @@ export interface IUser {
   normalizedEmail: string;
   password: string;
   role: string;
-  refreshToken: string;
+  refreshToken: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
