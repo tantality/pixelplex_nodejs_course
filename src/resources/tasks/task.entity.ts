@@ -1,4 +1,4 @@
-import { ITask } from './task.interface';
+import { ITask } from './types';
 
 let taskCounter = 1;
 

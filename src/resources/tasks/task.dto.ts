@@ -1,4 +1,4 @@
-import { ITask } from './task.interface';
+import { ITask } from './types';
 
 export class TaskDTO implements Omit<ITask, 'updatedAt' | 'userId' | 'hiddenWordId'> {
   public readonly id: number;

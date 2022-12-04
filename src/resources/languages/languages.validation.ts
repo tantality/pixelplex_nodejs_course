@@ -1,12 +1,6 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { SORT_BY } from '../../constants';
-import {
-  checkStringIn,
-  validateAndSanitizeString,
-  validateBaseQuery,
-  validateId,
-  validateStringLength,
-} from '../../validations';
+import { SORT_BY } from '../../types';
+import { checkStringIn, validateAndSanitizeString, validateBaseQuery, validateId, validateStringLength } from '../../validations';
 
 export class LanguagesValidation {
   private static codeLength: ParamSchema = validateStringLength(2, 4);

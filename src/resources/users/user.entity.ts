@@ -1,4 +1,4 @@
-import { IUser } from './user.interface';
+import { IUser } from './types';
 
 let userCounter = 1;
 
@@ -12,7 +12,7 @@ export class User implements IUser {
     public readonly normalizedEmail: string,
     public readonly password: string,
     public readonly role: string,
-    public readonly refreshToken: string,
+    public readonly refreshToken: string | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {
