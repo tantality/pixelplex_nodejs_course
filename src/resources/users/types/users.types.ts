@@ -10,3 +10,8 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export enum USER_ROLE {
+  USER = 'user',
+  ADMIN = 'admin',
+}

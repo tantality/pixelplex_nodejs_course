@@ -1,4 +1,4 @@
-import { ICard } from './card.interface';
+import { ICard } from './types';
 import { WordDTO } from './word.dto';
 
 export class CardDTO implements Omit<ICard, 'userId' | 'updatedAt'> {

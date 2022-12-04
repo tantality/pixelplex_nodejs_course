@@ -1,4 +1,4 @@
-import { IUser } from './user.interface';
+import { IUser } from './types';
 
 export class UserDTO implements Pick<IUser, 'id' | 'name' | 'email' | 'nativeLanguageId'> {
   public readonly id: number;

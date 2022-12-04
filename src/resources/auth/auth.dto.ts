@@ -1,4 +1,4 @@
-import { IUser } from '../users/user.interface';
+import { IUser } from '../users/types';
 
 export class AuthDTO implements Pick<IUser, 'refreshToken' | 'id'> {
   public readonly id: number;

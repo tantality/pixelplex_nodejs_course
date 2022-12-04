@@ -1,4 +1,4 @@
-import { IWord } from './word.interface';
+import { IWord } from './types';
 
 let wordCounter = 1;
 

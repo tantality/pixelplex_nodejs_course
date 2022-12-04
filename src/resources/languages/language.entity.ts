@@ -1,4 +1,4 @@
-import { ILanguage } from './language.interface';
+import { ILanguage } from './types';
 
 let languageCounter = 1;
 

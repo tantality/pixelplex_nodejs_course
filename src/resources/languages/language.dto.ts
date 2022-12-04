@@ -1,4 +1,4 @@
-import { ILanguage } from './language.interface';
+import { ILanguage } from './types';
 
 export class LanguageDTO implements Omit<ILanguage, 'updatedAt'> {
   public readonly id: number;
