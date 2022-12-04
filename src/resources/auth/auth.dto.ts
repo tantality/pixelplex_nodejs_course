@@ -6,7 +6,7 @@ export class AuthDTO implements Pick<IUser, 'refreshToken' | 'id'> {
   public readonly accessToken: string;
   constructor(user: IUser, accessToken: string) {
     this.id = user.id;
-    this.refreshToken = user.refreshToken;
+    this.refreshToken = user.refreshToken as string;
     this.accessToken = accessToken;
   }
 }
