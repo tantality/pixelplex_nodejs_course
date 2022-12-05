@@ -1,10 +1,11 @@
 import { ParamSchema, Schema } from 'express-validator';
 import { checkStringIn, validateAndSanitizeString, validateBaseQuery, validateId, validateStringLength } from '../../validations';
+import { MIN_CODE_LENGTH, MAX_CODE_LENGTH, MIN_NAME_LENGTH, MAX_NAME_LENGTH } from './languages.constants';
 import { LANGUAGE_SORT_BY } from './types';
 
 export class LanguagesValidation {
-  private static codeLength: ParamSchema = validateStringLength(2, 4);
-  private static nameLength: ParamSchema = validateStringLength(2, 50);
+  private static codeLength: ParamSchema = validateStringLength(MIN_CODE_LENGTH, MAX_CODE_LENGTH);
+  private static nameLength: ParamSchema = validateStringLength(MIN_NAME_LENGTH, MAX_NAME_LENGTH);
 
   static getLanguages: Schema = {
     ...validateBaseQuery,

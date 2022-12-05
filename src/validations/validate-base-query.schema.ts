@@ -1,24 +1,26 @@
 import { Schema } from 'express-validator';
 import { SORT_DIRECTION } from '../types';
-import { checkStringIn, validateAndSanitizeString, validateStringLength } from '.';
+import { DEFAULT_STRING_LENGTH } from '../constants';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET, MAX_LIMIT, MIN_INT, MIN_LIMIT } from './validations.constants';
+import { checkStringIn, validateAndSanitizeString } from '.';
 
 export const validateBaseQuery: Schema = {
   search: {
     in: ['query'],
     optional: true,
     ...validateAndSanitizeString,
-    ...validateStringLength,
+    ...DEFAULT_STRING_LENGTH,
   },
   offset: {
     in: ['query'],
     default: {
-      options: 0,
+      options: DEFAULT_OFFSET,
     },
     trim: true,
     isInt: {
-      errorMessage: 'Value must be a number greater than or equal to 0',
+      errorMessage: `Value must be a number greater than or equal to ${MIN_INT}`,
       options: {
-        min: 0,
+        min: MIN_INT,
       },
       bail: true,
     },
@@ -27,14 +29,14 @@ export const validateBaseQuery: Schema = {
   limit: {
     in: ['query'],
     default: {
-      options: 20,
+      options: DEFAULT_LIMIT,
     },
     trim: true,
     isInt: {
-      errorMessage: 'Value must be a number in the range from 1 to 100',
+      errorMessage: `Value must be a number in the range from ${MIN_LIMIT} to ${MAX_LIMIT}`,
       options: {
-        min: 1,
-        max: 100,
+        min: MIN_LIMIT,
+        max: MAX_LIMIT,
       },
       bail: true,
     },

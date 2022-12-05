@@ -8,6 +8,7 @@ import {
   validateIdInBody,
   validateArray,
 } from '../../validations';
+import { MIN_ARRAY_LENGTH, MAX_ARRAY_LENGTH } from './cards.constants';
 import { CARD_SORT_BY } from './types';
 
 export class CardsValidation {
@@ -16,10 +17,10 @@ export class CardsValidation {
   private static validateArray: ParamSchema = {
     in: ['body'],
     isArray: {
-      errorMessage: 'Value must be an array with the number of elements from 1 to 3',
+      errorMessage: `Value must be an array with the number of elements from ${MIN_ARRAY_LENGTH} to ${MAX_ARRAY_LENGTH}`,
       options: {
-        min: 1,
-        max: 3,
+        min: MIN_ARRAY_LENGTH,
+        max: MAX_ARRAY_LENGTH,
       },
       bail: true,
     },

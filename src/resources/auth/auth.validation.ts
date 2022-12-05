@@ -1,9 +1,12 @@
 import { Schema } from 'express-validator';
 import { validateIdInBody, validateStringLength } from '../../validations';
+import { MIN_NAME_LENGTH, MAX_NAME_LENGTH, MIN_PASSWORD_LENGTH } from './auth.constants';
 
 export class AuthValidation {
-  private static checkStrongPasswordRegExp =
-    /(?=.*[0-9])(?=.*[!@#$%^&*()_+=])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*()_+=]{8,}/g;
+  private static checkStrongPasswordRegExp = new RegExp(
+    '(?=.*[0-9])(?=.*[!@#$%^&*()_+=])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*()_+=]{' + MIN_PASSWORD_LENGTH + ',}',
+    'g',
+  );
 
   static logIn: Schema = {
     email: {
@@ -21,8 +24,7 @@ export class AuthValidation {
       },
       trim: true,
       matches: {
-        errorMessage:
-          'Value must consist of at least 8 lowercase and uppercase Latin characters, at least one digit and at least one special character (!@#$%^&*()_+=)',
+        errorMessage: `Value must consist of at least ${MIN_PASSWORD_LENGTH} lowercase and uppercase Latin characters, at least one digit and at least one special character (!@#$%^&*()_+=)`,
         options: AuthValidation.checkStrongPasswordRegExp,
       },
     },
@@ -35,7 +37,7 @@ export class AuthValidation {
         bail: true,
       },
       trim: true,
-      ...validateStringLength(5, 256),
+      ...validateStringLength(MIN_NAME_LENGTH, MAX_NAME_LENGTH),
     },
     ...AuthValidation.logIn,
     nativeLanguageId: {
