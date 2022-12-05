@@ -13,7 +13,7 @@
 
 ```TypeScript
 const languageSchema = new mongoose.Schema({
-  name: { type: String, index: true, required: true },
+  name: { type: String, required: true },
   code: { type: String, unique: true, index: true, required: true },
 }, { timestamps: true });
 
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
   normalizedEmail: { type: String, unique: true, index: true, required: true },
   password: { type: String, required: true },
   role: { type: String, enum: [USER_ROLE.USER, USER_ROLE.ADMIN], default: USER_ROLE.USER, required: true },
-  refreshToken: { type: String, required: true },
+  refreshToken: { type: String },
 }, { timestamps: true });
 
 const User = mongoose.model('user', userSchema);
