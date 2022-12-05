@@ -1,6 +1,6 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { SORT_BY } from '../../types';
 import { checkStringIn, validateAndSanitizeString, validateBaseQuery, validateId, validateStringLength } from '../../validations';
+import { LANGUAGE_SORT_BY } from './types';
 
 export class LanguagesValidation {
   private static codeLength: ParamSchema = validateStringLength(2, 4);
@@ -11,12 +11,12 @@ export class LanguagesValidation {
     sortBy: {
       in: ['query'],
       default: {
-        options: SORT_BY.DATE,
+        options: LANGUAGE_SORT_BY.DATE,
       },
       trim: true,
       toLowerCase: true,
       custom: {
-        options: (value: string) => checkStringIn(value, [SORT_BY.DATE, SORT_BY.NAME]),
+        options: (value: string) => checkStringIn(value, Object.values(LANGUAGE_SORT_BY)),
       },
     },
   };

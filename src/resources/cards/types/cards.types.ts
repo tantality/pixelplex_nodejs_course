@@ -6,3 +6,8 @@ export interface ICard {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export enum CARD_SORT_BY {
+  WORD = 'word',
+  DATE = 'date',
+}

@@ -20,3 +20,7 @@ export enum TASK_TYPE {
   TO_NATIVE = 'to_native',
   TO_FOREIGN = 'to_foreign',
 }
+
+export enum TASK_SORT_BY {
+  DATE = 'date',
+}

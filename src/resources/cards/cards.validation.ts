@@ -1,6 +1,5 @@
 import { ParamSchema, Schema } from 'express-validator';
 import { DEFAULT_STRING_LENGTH } from '../../constants';
-import { SORT_BY } from '../../types';
 import {
   validateAndSanitizeString,
   validateId,
@@ -9,6 +8,7 @@ import {
   validateIdInBody,
   validateArray,
 } from '../../validations';
+import { CARD_SORT_BY } from './types';
 
 export class CardsValidation {
   private static isArrayOfStrings = (arr: Array<any>): boolean => arr.every((elem) => typeof elem === 'string');
@@ -42,12 +42,12 @@ export class CardsValidation {
     sortBy: {
       in: ['query'],
       default: {
-        options: SORT_BY.DATE,
+        options: CARD_SORT_BY.DATE,
       },
       trim: true,
       toLowerCase: true,
       custom: {
-        options: (value: string) => checkStringIn(value, [SORT_BY.DATE, SORT_BY.WORD]),
+        options: (value: string) => checkStringIn(value, Object.values(CARD_SORT_BY)),
       },
     },
   };
