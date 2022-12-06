@@ -1,4 +1,4 @@
-import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
+import { DeepPartial, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { Language } from './language.entity';
 import { CreateLanguageBody, GetLanguagesCommon, UpdateLanguageBody } from './types';
 
@@ -31,8 +31,8 @@ export class LanguagesRepository {
     return language;
   };
 
-  static create = async ({ name, code }: CreateLanguageBody): Promise<Language> => {
-    const language = Language.create({ code, name });
+  static create = async (body: CreateLanguageBody): Promise<Language> => {
+    const language = Language.create(body as DeepPartial<Language>);
     const createdLanguage = await Language.save(language);
     return createdLanguage;
   };
