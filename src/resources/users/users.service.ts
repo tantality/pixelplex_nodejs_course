@@ -12,7 +12,7 @@ export class UsersService {
   };
 
   static create = async (userData: CreateUserData): Promise<User> => {
-    const nativeLanguage = await LanguagesService.findById(userData.nativeLanguageId);
+    const nativeLanguage = await LanguagesService.findOneByCondition({ id: userData.nativeLanguageId });
     if (!nativeLanguage) {
       throw new NotFoundError('Language not found.');
     }
@@ -34,7 +34,7 @@ export class UsersService {
 
     let nativeLanguage = null;
     if (userData as UpdateUserBody) {
-      nativeLanguage = await LanguagesService.findById((userData as UpdateUserBody).nativeLanguageId);
+      nativeLanguage = await LanguagesService.findOneByCondition({ id: (userData as UpdateUserBody).nativeLanguageId });
     }
     if (!nativeLanguage) {
       throw new NotFoundError('Language not found.');

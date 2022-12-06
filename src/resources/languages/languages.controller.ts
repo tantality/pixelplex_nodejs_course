@@ -27,7 +27,7 @@ export class LanguagesController {
 
   static getOneLanguage = async (req: GetOneLanguageRequest, res: GetOneLanguageResponse, next: NextFunction): Promise<void> => {
     try {
-      const language = await LanguagesService.findById(req.params.languageId);
+      const language = await LanguagesService.findOneByCondition({ id: req.params.languageId });
       if (!language) {
         throw new NotFoundError('Language not found.');
       }

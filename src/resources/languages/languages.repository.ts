@@ -26,13 +26,8 @@ export class LanguagesRepository {
     return { count, languages };
   };
 
-  static findByCode = async (code: string): Promise<Language | null> => {
-    const language = await Language.findOneBy({ code });
-    return language;
-  };
-
-  static findById = async (id: number): Promise<Language | null> => {
-    const language = await Language.findOneBy({ id });
+  static findOneByCondition = async (where: FindOptionsWhere<Language>): Promise<Language | null> => {
+    const language = await Language.findOneBy(where);
     return language;
   };
 
@@ -44,7 +39,7 @@ export class LanguagesRepository {
 
   static update = async (currentLanguage: Language, id: number, body: UpdateLanguageBody): Promise<Language> => {
     await Language.update({ id }, { ...currentLanguage, ...body });
-    const updatedLanguage = (await LanguagesRepository.findById(id)) as Language;
+    const updatedLanguage = (await LanguagesRepository.findOneByCondition({ id })) as Language;
     return updatedLanguage;
   };
 
