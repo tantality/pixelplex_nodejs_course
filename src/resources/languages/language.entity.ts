@@ -1,6 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, Relation } from 'typeorm';
 import { User } from '../users/user.entity';
-import { ILanguage } from './language.interface';
+import { ILanguage } from './types';
 
 @Entity('languages')
 export class Language extends BaseEntity implements ILanguage {

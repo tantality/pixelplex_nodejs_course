@@ -1,7 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
 import { Language } from '../languages/language.entity';
-import { IUser } from './user.interface';
-import { USER_ROLE } from './types';
+import { IUser, USER_ROLE } from './types';
 
 @Entity('users')
 export class User extends BaseEntity implements IUser {
