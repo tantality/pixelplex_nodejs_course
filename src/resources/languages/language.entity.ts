@@ -1,12 +1,12 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
-import { ILanguage } from './types';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, Relation } from 'typeorm';
+import { User } from '../users/user.entity';
+import { ILanguage } from './language.interface';
 
 @Entity('languages')
 export class Language extends BaseEntity implements ILanguage {
   @PrimaryGeneratedColumn()
     id!: number;
 
-  @Index()
   @Column({ type: 'varchar', length: 255 })
     name!: string;
 
@@ -19,4 +19,7 @@ export class Language extends BaseEntity implements ILanguage {
 
   @UpdateDateColumn()
     updatedAt!: Date;
+
+  @OneToMany(() => User, (user) => user.nativeLanguage)
+    users!: Relation<User>[];
 }
