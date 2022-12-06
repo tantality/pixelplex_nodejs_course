@@ -32,7 +32,7 @@ export class User extends BaseEntity implements IUser {
     role!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-    refreshToken!: string;
+    refreshToken!: string | null;
 
   @CreateDateColumn()
     createdAt!: Date;
