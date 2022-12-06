@@ -1,5 +1,5 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { DEFAULT_STRING_LENGTH } from '../../constants';
+import { DEFAULT_STRING_LENGTH_VALIDATION } from '../../constants';
 import {
   checkStringIn,
   validateAndSanitizeString,
@@ -130,7 +130,7 @@ export class TasksValidation {
     answer: {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
   };
 }

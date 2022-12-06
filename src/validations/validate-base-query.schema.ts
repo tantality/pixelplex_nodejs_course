@@ -1,6 +1,6 @@
 import { Schema } from 'express-validator';
 import { SORT_DIRECTION } from '../types';
-import { DEFAULT_STRING_LENGTH } from '../constants';
+import { DEFAULT_STRING_LENGTH_VALIDATION } from '../constants';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET, MAX_LIMIT, MIN_INT, MIN_LIMIT } from './validations.constants';
 import { checkStringIn, validateAndSanitizeString } from '.';
 
@@ -9,7 +9,7 @@ export const validateBaseQuery: Schema = {
     in: ['query'],
     optional: true,
     ...validateAndSanitizeString,
-    ...DEFAULT_STRING_LENGTH,
+    ...DEFAULT_STRING_LENGTH_VALIDATION,
   },
   offset: {
     in: ['query'],

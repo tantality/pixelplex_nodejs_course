@@ -4,4 +4,4 @@ import { validateStringLength } from '../validations/validate-string-length.para
 const MIN_STRING_LENGTH = 1;
 const MAX_STRING_LENGTH = 255;
 
-export const DEFAULT_STRING_LENGTH: ParamSchema = validateStringLength(MIN_STRING_LENGTH, MAX_STRING_LENGTH);
+export const DEFAULT_STRING_LENGTH_VALIDATION: ParamSchema = validateStringLength(MIN_STRING_LENGTH, MAX_STRING_LENGTH);

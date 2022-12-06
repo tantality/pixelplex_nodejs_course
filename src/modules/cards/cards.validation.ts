@@ -1,5 +1,5 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { DEFAULT_STRING_LENGTH } from '../../constants';
+import { DEFAULT_STRING_LENGTH_VALIDATION } from '../../constants';
 import {
   validateAndSanitizeString,
   validateId,
@@ -57,12 +57,12 @@ export class CardsValidation {
     'nativeWords.*': {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     'foreignWords.*': {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     nativeWords: {
       ...CardsValidation.validateArray,
@@ -90,13 +90,13 @@ export class CardsValidation {
       in: ['body'],
       optional: true,
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     'foreignWords.*': {
       in: ['body'],
       optional: true,
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     nativeWords: {
       optional: true,
