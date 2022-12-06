@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import * as express from 'express';
 import { processError, processNotFoundEndpoint } from './middleware';
-import { mountAuthRouter } from './resources/auth/auth.router';
-import { mountCardsRouter } from './resources/cards/cards.router';
-import { mountLanguagesRouter } from './resources/languages/languages.router';
-import { mountTasksRouter } from './resources/tasks/tasks.router';
-import { mountUsersRouter } from './resources/users/users.router';
+import { mountAuthRouter } from './modules/auth/auth.router';
+import { mountCardsRouter } from './modules/cards/cards.router';
+import { mountLanguagesRouter } from './modules/languages/languages.router';
+import { mountTasksRouter } from './modules/tasks/tasks.router';
+import { mountUsersRouter } from './modules/users/users.router';
 const app = express.default();
 
 app.use(express.json());
