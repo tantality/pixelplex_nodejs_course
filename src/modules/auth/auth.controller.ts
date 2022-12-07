@@ -16,8 +16,9 @@ export class AuthController {
 
   static logIn = async (req: LogInRequest, res: LogInResponse, next: NextFunction): Promise<void> => {
     try {
-      const auth = await AuthService.logIn(req);
-      res.status(200).json(auth);
+      const authData = await AuthService.logIn(req.body);
+      res.cookie('refreshToken', authData.refreshToken, { maxAge: REFRESH_TOKEN_LIFETIME_IN_MS, httpOnly: true, sameSite: 'strict' });
+      res.status(200).json(authData);
     } catch (err) {
       next(err);
     }
