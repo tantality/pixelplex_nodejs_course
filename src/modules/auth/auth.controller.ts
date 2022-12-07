@@ -5,8 +5,8 @@ import { SignUpResponse, LogInResponse, LogOutResponse, RefreshTokensResponse, S
 export class AuthController {
   static signUp = async (req: SignUpRequest, res: SignUpResponse, next: NextFunction): Promise<void> => {
     try {
-      const auth = await AuthService.signUp(req);
-      res.status(201).json(auth);
+      const authData = await AuthService.signUp(req.body);
+      res.status(201).json(authData);
     } catch (err) {
       next(err);
     }
