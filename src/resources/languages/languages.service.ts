@@ -1,19 +1,26 @@
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
 import { GetLanguagesCommon, UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
 import { LanguagesRepository } from './languages.repository';
 import { Language } from './language.entity';
-import { getOrderOptions, getWhereOptions } from './utils';
+import { getSortingCondition } from './utils';
 
 export class LanguagesService {
   static findAndCountAll = async ({ search, sortBy, sortDirection, limit, offset }: GetLanguagesQuery): Promise<GetLanguagesCommon> => {
+    let whereCondition: FindOptionsWhere<Language> = {};
+    if (search) {
+      whereCondition = {
+        name: ILike(`%${search}%`),
+      };
+    }
+
     const languagesAndCount = await LanguagesRepository.findAndCountAll(
       offset,
       limit,
-      getWhereOptions(search),
-      getOrderOptions(sortBy, sortDirection),
+      whereCondition,
+      getSortingCondition(sortBy, sortDirection),
     );
     return languagesAndCount;
   };

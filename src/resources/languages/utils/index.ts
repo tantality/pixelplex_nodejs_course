@@ -1,1 +1,1 @@
-export * from './find-options.utils';
+export * from './get-sorting-condition.utils';
