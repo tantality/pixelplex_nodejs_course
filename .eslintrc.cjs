@@ -27,6 +27,7 @@ module.exports = {
     '@typescript-eslint/indent': ['error', 2, { 'ignoredNodes': ['TemplateLiteral > *'] }],
     'no-tabs': 2,
     'space-before-blocks': ['error'],
+    'space-infix-ops': ['error', { int32Hint: false }],
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/no-inferrable-types': 'off',
     'quotes': ['error', 'single'],
