@@ -1,6 +1,5 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { DEFAULT_STRING_LENGTH } from '../../constants';
-import { SORT_BY } from '../../types';
+import { DEFAULT_STRING_LENGTH_VALIDATION } from '../../constants';
 import {
   checkStringIn,
   validateAndSanitizeString,
@@ -9,7 +8,7 @@ import {
   validateId,
   validateIdInBody,
 } from '../../validations';
-import { TASK_STATUS, TASK_TYPE } from './types';
+import { TASK_SORT_BY, TASK_STATUS, TASK_TYPE } from './types';
 
 export class TasksValidation {
   private static isInvalidDate = (date: Date): boolean => date.getTime() >= new Date().getTime();
@@ -55,12 +54,12 @@ export class TasksValidation {
     sortBy: {
       in: ['query'],
       default: {
-        options: SORT_BY.DATE,
+        options: TASK_SORT_BY.DATE,
       },
       trim: true,
       toLowerCase: true,
       custom: {
-        options: (value: string) => checkStringIn(value, [SORT_BY.DATE]),
+        options: (value: string) => checkStringIn(value, [TASK_SORT_BY.DATE]),
       },
     },
   };
@@ -131,7 +130,7 @@ export class TasksValidation {
     answer: {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
   };
 }

@@ -1,6 +1,5 @@
 import { ParamSchema, Schema } from 'express-validator';
-import { DEFAULT_STRING_LENGTH } from '../../constants';
-import { SORT_BY } from '../../types';
+import { DEFAULT_STRING_LENGTH_VALIDATION } from '../../constants';
 import {
   validateAndSanitizeString,
   validateId,
@@ -9,6 +8,8 @@ import {
   validateIdInBody,
   validateArray,
 } from '../../validations';
+import { MIN_ARRAY_LENGTH, MAX_ARRAY_LENGTH } from './cards.constants';
+import { CARD_SORT_BY } from './types';
 
 export class CardsValidation {
   private static isArrayOfStrings = (arr: Array<any>): boolean => arr.every((elem) => typeof elem === 'string');
@@ -16,10 +17,10 @@ export class CardsValidation {
   private static validateArray: ParamSchema = {
     in: ['body'],
     isArray: {
-      errorMessage: 'Value must be an array with the number of elements from 1 to 3',
+      errorMessage: `Value must be an array with the number of elements from ${MIN_ARRAY_LENGTH} to ${MAX_ARRAY_LENGTH}`,
       options: {
-        min: 1,
-        max: 3,
+        min: MIN_ARRAY_LENGTH,
+        max: MAX_ARRAY_LENGTH,
       },
       bail: true,
     },
@@ -42,12 +43,12 @@ export class CardsValidation {
     sortBy: {
       in: ['query'],
       default: {
-        options: SORT_BY.DATE,
+        options: CARD_SORT_BY.DATE,
       },
       trim: true,
       toLowerCase: true,
       custom: {
-        options: (value: string) => checkStringIn(value, [SORT_BY.DATE, SORT_BY.WORD]),
+        options: (value: string) => checkStringIn(value, Object.values(CARD_SORT_BY)),
       },
     },
   };
@@ -56,12 +57,12 @@ export class CardsValidation {
     'nativeWords.*': {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     'foreignWords.*': {
       in: ['body'],
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     nativeWords: {
       ...CardsValidation.validateArray,
@@ -89,13 +90,13 @@ export class CardsValidation {
       in: ['body'],
       optional: true,
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     'foreignWords.*': {
       in: ['body'],
       optional: true,
       ...validateAndSanitizeString,
-      ...DEFAULT_STRING_LENGTH,
+      ...DEFAULT_STRING_LENGTH_VALIDATION,
     },
     nativeWords: {
       optional: true,

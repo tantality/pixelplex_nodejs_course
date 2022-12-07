@@ -1,4 +1,5 @@
 import { ParamSchema } from 'express-validator';
+import { MIN_ID } from './validations.constants';
 
 const isValueInt = (value: any): boolean => {
   if (!Number.isInteger(value)) {
@@ -13,9 +14,9 @@ export const validateIdInBody: ParamSchema = {
     bail: true,
   },
   isInt: {
-    errorMessage: 'Value must be a number greater than 0',
+    errorMessage: `Value must be a number greater than or equal ${MIN_ID}`,
     options: {
-      min: 1,
+      min: MIN_ID,
     },
     bail: true,
   },

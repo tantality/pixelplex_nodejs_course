@@ -5,3 +5,8 @@ export interface ILanguage {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export enum LANGUAGE_SORT_BY {
+  NAME = 'name',
+  DATE = 'date',
+}

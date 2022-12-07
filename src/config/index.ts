@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { DataSourceOptions } from 'typeorm';
-import { Language } from '../resources/languages/language.entity';
-import { User } from '../resources/users/user.entity';
+import { User } from '../modules/users/user.entity';
+import { Language } from '../modules/languages/language.entity';
 
 dotenv.config();
 

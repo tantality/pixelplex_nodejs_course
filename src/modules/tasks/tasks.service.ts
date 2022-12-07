@@ -1,8 +1,9 @@
 /* eslint-disable require-await */
 import { logRequest } from '../../utils';
-import { LANGUAGE_DTO } from '../languages/languages.constants';
+import { LanguageDTO } from '../languages/language.dto';
+import { Language } from '../languages/language.entity';
 import { TaskDTO } from './task.dto';
-import { TASK_DTO } from './tasks.constants';
+import { Task } from './task.entity';
 import {
   GetTasksRequest,
   GetTasksCommon,
@@ -13,12 +14,21 @@ import {
   CreateTaskRequest,
 } from './types';
 
+const language = new Language();
+language.code = 'russian';
+language.name = 'ru';
+language.createdAt = new Date();
+language.updatedAt = new Date();
+const languageDTO = new LanguageDTO(language);
+const task = new Task(1, 1, 'to_foreign', 'correct', ['привет'], 'привет', new Date(), new Date());
+const taskDTO = new TaskDTO(task, 'hello', 1, 2);
+
 export class TasksService {
   static findAll = async (req: GetTasksRequest): Promise<GetTasksCommon | null> => {
     logRequest(req);
     return {
       count: 30,
-      tasks: [TASK_DTO],
+      tasks: [taskDTO],
     };
   };
 
@@ -26,7 +36,7 @@ export class TasksService {
     logRequest(req);
     const statistics = [
       {
-        language: LANGUAGE_DTO,
+        language: languageDTO,
         answers: {
           correct: 10,
           incorrect: 1,
@@ -50,6 +60,6 @@ export class TasksService {
 
   static addAnswer = async (req: AddAnswerToTaskRequest): Promise<TaskDTO> => {
     logRequest(req);
-    return TASK_DTO;
+    return taskDTO;
   };
 }
