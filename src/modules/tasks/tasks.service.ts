@@ -15,6 +15,7 @@ import {
 } from './types';
 
 const language = new Language();
+language.id = 1;
 language.code = 'russian';
 language.name = 'ru';
 language.createdAt = new Date();
