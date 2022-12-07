@@ -3,8 +3,8 @@ import { CreateUserData, UpdateUserData } from './types';
 import { User } from './user.entity';
 
 export class UsersRepository {
-  static findOneByCondition = async (where: FindOptionsWhere<User>): Promise<User | null> => {
-    const user = await User.findOneBy(where);
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<User>): Promise<User | null> => {
+    const user = await User.findOneBy(whereCondition);
     return user;
   };
 

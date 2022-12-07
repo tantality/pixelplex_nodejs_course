@@ -6,8 +6,8 @@ import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
 
 export class UsersService {
-  static findOneByCondition = async (where: FindOptionsWhere<User>): Promise<User | null> => {
-    const user = await UsersRepository.findOneByCondition(where);
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<User>): Promise<User | null> => {
+    const user = await UsersRepository.findOneByCondition(whereCondition);
     return user;
   };
 
