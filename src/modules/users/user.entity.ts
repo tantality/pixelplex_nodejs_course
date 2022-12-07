@@ -1,4 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
+import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
+import { MAX_NAME_LENGTH } from '../auth/auth.constants';
 import { Language } from '../languages/language.entity';
 import { IUser, USER_ROLE } from './types';
 
@@ -16,22 +18,22 @@ export class User extends BaseEntity implements IUser {
   @Column()
     nativeLanguageId!: number;
 
-  @Column({ type: 'varchar', length: 257 })
+  @Column({ type: 'varchar', length: MAX_NAME_LENGTH })
     name!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH })
     email!: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH, unique: true })
     normalizedEmail!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH })
     password!: string;
 
   @Column({ type: 'enum', enum: USER_ROLE, default: USER_ROLE.USER })
     role!: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH, nullable: true })
     refreshToken!: string | null;
 
   @CreateDateColumn()
