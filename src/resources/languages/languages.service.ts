@@ -16,17 +16,17 @@ export class LanguagesService {
       };
     }
 
-    const languagesAndCount = await LanguagesRepository.findAndCountAll(
+    const languagesAndTheirNumber = await LanguagesRepository.findAndCountAll(
       offset,
       limit,
       whereCondition,
       getSortingCondition(sortBy, sortDirection),
     );
-    return languagesAndCount;
+    return languagesAndTheirNumber;
   };
 
-  static findOneByCondition = async (where: FindOptionsWhere<Language>): Promise<Language | null> => {
-    const language = await LanguagesRepository.findOneByCondition(where);
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Language>): Promise<Language | null> => {
+    const language = await LanguagesRepository.findOneByCondition(whereCondition);
     return language;
   };
 

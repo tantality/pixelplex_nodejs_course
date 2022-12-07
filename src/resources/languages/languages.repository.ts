@@ -6,28 +6,28 @@ export class LanguagesRepository {
   static findAndCountAll = async (
     skip: number,
     take: number,
-    where: FindOptionsWhere<Language>,
-    order: FindOptionsOrder<Language>,
+    whereCondition: FindOptionsWhere<Language>,
+    orderCondition: FindOptionsOrder<Language>,
   ): Promise<GetLanguagesCommon> => {
-    const languagesAndCount = await Language.findAndCount({
+    const languagesAndTheirNumber = await Language.findAndCount({
       select: {
         id: true,
         code: true,
         name: true,
         createdAt: true,
       },
-      where,
-      order,
+      where: whereCondition,
+      order: orderCondition,
       skip,
       take,
     });
 
-    const [languages, count] = languagesAndCount;
+    const [languages, count] = languagesAndTheirNumber;
     return { count, languages };
   };
 
-  static findOneByCondition = async (where: FindOptionsWhere<Language>): Promise<Language | null> => {
-    const language = await Language.findOneBy(where);
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Language>): Promise<Language | null> => {
+    const language = await Language.findOneBy(whereCondition);
     return language;
   };
 
