@@ -33,7 +33,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(body.password, 10);
 
-    const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword, refreshToken: null });
+    const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
 
     const { accessToken, refreshToken } = TokenService.generateTokens({ userId: id, role });
 

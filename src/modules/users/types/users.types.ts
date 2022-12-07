@@ -19,5 +19,5 @@ export enum USER_ROLE {
   ADMIN = 'admin',
 }
 
-export type CreateUserData = Pick<User, 'name' | 'email' | 'normalizedEmail' | 'password' | 'refreshToken' | 'nativeLanguageId'>;
+export type CreateUserData = Pick<User, 'name' | 'email' | 'normalizedEmail' | 'password' | 'nativeLanguageId'>;
 export type UpdateUserData = UpdateUserBody | Pick<User, 'refreshToken'>;
