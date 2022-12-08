@@ -8,7 +8,7 @@ import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { AuthDTO } from './auth.dto';
 import { LogInBody, SignUpBody } from './types';
-import { TokenService } from './token.service';
+import { JWTService } from './jwt.service';
 
 const user = new User();
 user.id = 1;
@@ -35,7 +35,7 @@ export class AuthService {
 
     const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
 
-    const { accessToken, refreshToken } = TokenService.generateTokens({ userId: id, role });
+    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
 
     await UsersService.update(id, { refreshToken });
 
@@ -61,7 +61,7 @@ export class AuthService {
 
     const { id, role } = user;
 
-    const { accessToken, refreshToken } = TokenService.generateTokens({ userId: id, role });
+    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
 
     await UsersService.update(id, { refreshToken });
 
