@@ -26,8 +26,9 @@ export class AuthController {
 
   static logOut = async (req: Request, res: LogOutResponse, next: NextFunction): Promise<void> => {
     try {
-      const userId = await AuthService.logOut(req);
-      res.status(200).json({ id: userId });
+      await AuthService.logOut(req.userId as number);
+      res.clearCookie('refreshToken');
+      res.status(200).json({ id: req.userId as number });
     } catch (err) {
       next(err);
     }

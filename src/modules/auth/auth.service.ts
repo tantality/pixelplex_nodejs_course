@@ -72,9 +72,8 @@ export class AuthService {
     };
   };
 
-  static logOut = async (req: Request): Promise<number> => {
-    logRequest(req);
-    return 1;
+  static logOut = async (userId: number): Promise<void> => {
+    await UsersService.update(userId, { refreshToken: null });
   };
 
   static refresh = async (req: Request): Promise<AuthDTO> => {
