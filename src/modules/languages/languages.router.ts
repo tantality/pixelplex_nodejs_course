@@ -1,6 +1,6 @@
 import { Router, Application } from 'express';
 import { checkSchema } from 'express-validator';
-import { isAuth, validatePayload } from '../../middleware';
+import { isAdmin, isAuth, validatePayload } from '../../middleware';
 import { CreateLanguageRequest, DeleteLanguageRequest, GetLanguagesRequest, GetOneLanguageRequest, UpdateLanguageRequest } from './types';
 import { LanguagesController } from './languages.controller';
 import { LanguagesValidation } from './languages.validation';
@@ -26,6 +26,7 @@ router.post(
   checkSchema(LanguagesValidation.createLanguage),
   validatePayload<CreateLanguageRequest>,
   isAuth<CreateLanguageRequest>,
+  isAdmin<CreateLanguageRequest>,
   LanguagesController.createLanguage,
 );
 router.patch(
@@ -33,6 +34,7 @@ router.patch(
   checkSchema(LanguagesValidation.updateLanguage),
   validatePayload<UpdateLanguageRequest>,
   isAuth<UpdateLanguageRequest>,
+  isAdmin<UpdateLanguageRequest>,
   LanguagesController.updateLanguage,
 );
 router.delete(
@@ -40,6 +42,7 @@ router.delete(
   checkSchema(LanguagesValidation.deleteLanguage),
   validatePayload<DeleteLanguageRequest>,
   isAuth<DeleteLanguageRequest>,
+  isAdmin<DeleteLanguageRequest>,
   LanguagesController.deleteLanguage,
 );
 
