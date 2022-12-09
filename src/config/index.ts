@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import { DataSourceOptions } from 'typeorm';
 import { User } from '../modules/users/user.entity';
 import { Language } from '../modules/languages/language.entity';
+import * as Migrations from '../migrations';
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ export const DB: DataSourceOptions = {
   synchronize: false,
   logging: false,
   entities: [Language, User],
+  migrations: Object.values(Migrations),
+  migrationsRun: true,
 };
 
 export const config = {

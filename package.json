@@ -12,7 +12,12 @@
     "launch:dev": "nodemon src/server.ts",
     "audit": "npx audit-ci --config audit-ci.json",
     "lint": "npx eslint src/",
-    "lint:fix": "npx eslint src/ --fix"
+    "lint:fix": "npx eslint src/ --fix",
+    "typeorm": "typeorm-ts-node-esm",
+    "migrate:create": "npm run typeorm migration:create ./src/migrations/ -- -n",
+    "migrate:run": "npm run typeorm migration:run -- -d ./src/data-source.ts",
+    "migrate:revert": "npm run typeorm migration:revert -- -d ./src/data-source.ts",
+    "migrate:generate": "npm run typeorm migration:generate ./src/migrations/ -- -d ./src/data-source.ts"
   },
   "author": "",
   "license": "ISC",
