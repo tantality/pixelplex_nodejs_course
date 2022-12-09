@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 
-export const connectToDb = async (options: DataSourceOptions): Promise<DataSource> => {
-  const AppDataSource = new DataSource(options);
+export const connectToDb = async (AppDataSource: DataSource): Promise<DataSource> => {
   await AppDataSource.initialize()
     .then(() => {
       console.log('Data Source has been initialized!');
