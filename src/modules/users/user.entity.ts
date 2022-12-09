@@ -1,4 +1,14 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
+import {
+  Entity,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Relation,
+} from 'typeorm';
 import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
 import { MAX_NAME_LENGTH } from '../auth/auth.constants';
 import { Language } from '../languages/language.entity';
@@ -9,14 +19,14 @@ export class User extends BaseEntity implements IUser {
   @PrimaryGeneratedColumn()
     id!: number;
 
-  @ManyToOne(() => Language, (language) => language.users)
+  @ManyToOne(() => Language, (language) => language.users, { nullable: true })
   @JoinColumn({
     name: 'nativeLanguageId',
   })
-    nativeLanguage!: Relation<Language>;
+    nativeLanguage!: Relation<Language> | null;
 
-  @Column()
-    nativeLanguageId!: number;
+  @Column({ nullable: true })
+    nativeLanguageId!: number | null;
 
   @Column({ type: 'varchar', length: MAX_NAME_LENGTH })
     name!: string;

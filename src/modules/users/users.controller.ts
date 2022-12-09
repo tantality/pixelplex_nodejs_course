@@ -7,7 +7,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   static getOneUser = async (req: Request, res: GetOneUserResponse, next: NextFunction): Promise<void> => {
     try {
-      const user = await UsersService.findOneByCondition({ id: req.userId }) as User;
+      const user = (await UsersService.findOneByCondition({ id: req.userId as number })) as User;
       res.status(200).json(new UserDTO(user));
     } catch (err) {
       next(err);

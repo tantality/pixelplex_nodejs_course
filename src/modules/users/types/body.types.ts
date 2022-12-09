@@ -1,3 +1,1 @@
-import { IUser } from '.';
-
-export type UpdateUserBody = Pick<IUser, 'nativeLanguageId'>;
+export type UpdateUserBody = { nativeLanguageId: number };
