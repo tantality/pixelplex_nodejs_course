@@ -2,12 +2,11 @@ import normalizeEmail from 'normalize-email';
 import * as bcrypt from 'bcrypt';
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../../errors';
 import { UsersService } from '../users/users.service';
-import { AuthDTO } from './auth.dto';
-import { LogInBody, SignUpBody } from './types';
+import { IAuth, LogInBody, SignUpBody } from './types';
 import { JWTService } from './jwt.service';
 
 export class AuthService {
-  static signUp = async (body: SignUpBody): Promise<AuthDTO> => {
+  static signUp = async (body: SignUpBody): Promise<IAuth> => {
     const normalizedEmail = normalizeEmail(body.email);
 
     const user = await UsersService.findOneByCondition({ normalizedEmail });
@@ -30,7 +29,7 @@ export class AuthService {
     };
   };
 
-  static logIn = async ({ email, password }: LogInBody): Promise<AuthDTO> => {
+  static logIn = async ({ email, password }: LogInBody): Promise<IAuth> => {
     const normalizedEmail = normalizeEmail(email);
 
     const user = await UsersService.findOneByCondition({ normalizedEmail });
@@ -60,7 +59,7 @@ export class AuthService {
     await UsersService.update(userId, { refreshToken: null });
   };
 
-  static refresh = async (refreshTokenReceived?: string): Promise<AuthDTO> => {
+  static refresh = async (refreshTokenReceived?: string): Promise<IAuth> => {
     if (!refreshTokenReceived) {
       throw new UnauthorizedError('Refresh token is missing');
     }
