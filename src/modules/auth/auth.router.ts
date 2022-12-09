@@ -10,7 +10,7 @@ const router = Router();
 
 router.post('/sign-up', checkSchema(AuthValidation.signUp), validatePayload<SignUpRequest>, AuthController.signUp);
 router.post('/log-in', checkSchema(AuthValidation.logIn), validatePayload<LogInRequest>, AuthController.logIn);
-router.get('/me', UsersController.getOneUser);
+router.get('/me', isAuth, UsersController.getOneUser);
 router.get('/log-out', isAuth, AuthController.logOut);
 router.post('/refresh-tokens', AuthController.refreshTokens);
 
