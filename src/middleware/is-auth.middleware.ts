@@ -1,11 +1,11 @@
-/* eslint-disable import/no-named-as-default-member */
 import { NextFunction, Request, Response } from 'express';
 import { UnauthorizedError } from '../errors';
 import { JWTService } from '../modules/auth/jwt.service';
 
-export function isAuth(req: Request, _res: Response, next: NextFunction): void {
+export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
   try {
-    const authHeader = req.get('Authorization');
+    const request = req as T & Request;
+    const authHeader = request.get('Authorization');
     if (!authHeader) {
       throw new UnauthorizedError('Authorization header is missing.');
     }
@@ -13,8 +13,8 @@ export function isAuth(req: Request, _res: Response, next: NextFunction): void {
     const accessToken = authHeader.split(' ')[1];
     const verifiedAccessToken = JWTService.validateAccessToken(accessToken);
 
-    req.userId = verifiedAccessToken.userId;
-    req.role = verifiedAccessToken.role;
+    request.userId = verifiedAccessToken.userId;
+    request.role = verifiedAccessToken.role;
 
     next();
   } catch (err) {
