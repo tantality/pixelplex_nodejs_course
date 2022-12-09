@@ -4,6 +4,7 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from '../../errors'
 import { UsersService } from '../users/users.service';
 import { IAuth, LogInBody, SignUpBody } from './types';
 import { JWTService } from './jwt.service';
+import { SALT_ROUNDS } from './auth.constants';
 
 export class AuthService {
   static signUp = async (body: SignUpBody): Promise<IAuth> => {
@@ -14,7 +15,7 @@ export class AuthService {
       throw new BadRequestError('The user with the specified email already exists.');
     }
 
-    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
 
     const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
 
