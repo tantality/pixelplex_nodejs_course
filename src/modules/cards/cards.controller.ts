@@ -1,5 +1,4 @@
 import { NextFunction } from 'express';
-import { CardDTO } from './card.dto';
 import { CardsService } from './cards.service';
 import {
   GetCardsRequest,
@@ -34,8 +33,8 @@ export class CardsController {
 
   static updateCard = async (req: UpdateCardRequest, res: UpdateCardResponse, next: NextFunction): Promise<void> => {
     try {
-      const updatedCard = await CardsService.update(req);
-      res.status(200).json(updatedCard as CardDTO);
+      const updatedCard = await CardsService.update(req.userId as number, req.params.cardId, req.body);
+      res.status(200).json(updatedCard);
     } catch (err) {
       next(err);
     }
