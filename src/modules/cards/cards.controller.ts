@@ -25,7 +25,7 @@ export class CardsController {
 
   static createCard = async (req: CreateCardRequest, res: CreateCardResponse, next: NextFunction): Promise<void> => {
     try {
-      const createdCard = await CardsService.create(req);
+      const createdCard = await CardsService.create(req.userId as number, req.body);
       res.status(201).json(createdCard);
     } catch (err) {
       next(err);
