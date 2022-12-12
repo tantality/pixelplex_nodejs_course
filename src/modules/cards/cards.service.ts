@@ -8,7 +8,7 @@ import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardsRepository } from './cards.repository';
-import { GetCardsRequest, GetCardsCommon, DeleteCardRequest, CreateCardBody, UpdateCardBody } from './types';
+import { GetCardsRequest, GetCardsCommon, CreateCardBody, UpdateCardBody } from './types';
 import { WordDTO } from './word.dto';
 import { Word } from './word.entity';
 import { WordsService } from './words.service';
@@ -128,8 +128,14 @@ export class CardsService {
     return new CardDTO(updatedCard, updatedNativeWordsDTOs, updatedForeignWordsDTOs);
   };
 
-  static delete = async (req: DeleteCardRequest): Promise<number | null> => {
-    logRequest(req);
-    return 1;
+  static delete = async (userId: number, cardId: number): Promise<number> => {
+    const deletableCard = await CardsService.findOneByCondition({ userId, id: cardId });
+    if (!deletableCard) {
+      throw new NotFoundError('Card not found.');
+    }
+
+    await CardsRepository.delete(cardId);
+
+    return cardId;
   };
 }

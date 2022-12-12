@@ -27,4 +27,8 @@ export class CardsRepository {
 
     return updatedCard;
   };
+
+  static delete = async (id: number): Promise<void> => {
+    await Card.delete({ id });
+  };
 }
