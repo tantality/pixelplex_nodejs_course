@@ -22,6 +22,7 @@ export class LanguagesService {
       whereCondition,
       getSortingCondition(sortBy, sortDirection),
     );
+
     return languagesAndTheirNumber;
   };
 
@@ -31,12 +32,13 @@ export class LanguagesService {
   };
 
   static create = async (body: CreateLanguageBody): Promise<LanguageDTO> => {
-    const languageWithCurrentCode = await LanguagesService.findOneByCondition({ code: body.code });
-    if (languageWithCurrentCode) {
+    const language = await LanguagesService.findOneByCondition({ code: body.code });
+    if (language) {
       throw new BadRequestError('The language with the specified code already exists.');
     }
 
     const createdLanguage = await LanguagesRepository.create(body);
+
     return new LanguageDTO(createdLanguage);
   };
 
@@ -47,12 +49,13 @@ export class LanguagesService {
     }
 
     const { code } = body;
-    const languageWithCurrentCode = code && (await LanguagesService.findOneByCondition({ code: body.code }));
+    const languageWithCurrentCode = code && (await LanguagesService.findOneByCondition({ code }));
     if (languageWithCurrentCode) {
       throw new BadRequestError('The language with the specified code already exists.');
     }
 
     const updatedLanguage = await LanguagesRepository.update(updatableLanguage, languageId, body);
+
     return new LanguageDTO(updatedLanguage);
   };
 
@@ -68,6 +71,7 @@ export class LanguagesService {
     }
 
     await LanguagesRepository.delete(languageId);
+
     return languageId;
   };
 }

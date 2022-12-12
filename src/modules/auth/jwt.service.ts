@@ -7,6 +7,7 @@ export class JWTService {
   static generateTokens = (payload: JWTPayload): Omit<IAuth, 'id'> => {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET as string, { expiresIn: `${ACCESS_TOKEN_LIFETIME_IN_MS}ms` });
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string, { expiresIn: `${REFRESH_TOKEN_LIFETIME_IN_MS}ms` });
+
     return { accessToken, refreshToken };
   };
 

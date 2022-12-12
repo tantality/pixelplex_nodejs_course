@@ -9,16 +9,13 @@ import { SALT_ROUNDS } from './auth.constants';
 export class AuthService {
   static signUp = async (body: SignUpBody): Promise<IAuth> => {
     const normalizedEmail = normalizeEmail(body.email);
-
     const user = await UsersService.findOneByCondition({ normalizedEmail });
     if (user) {
       throw new BadRequestError('The user with the specified email already exists.');
     }
 
     const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
-
     const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
-
     const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
 
     await UsersService.update(id, { refreshToken });
@@ -32,7 +29,6 @@ export class AuthService {
 
   static logIn = async ({ email, password }: LogInBody): Promise<IAuth> => {
     const normalizedEmail = normalizeEmail(email);
-
     const user = await UsersService.findOneByCondition({ normalizedEmail });
     if (!user) {
       throw new NotFoundError('The user with the specified email does not exist.');
@@ -44,7 +40,6 @@ export class AuthService {
     }
 
     const { id, role } = user;
-
     const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
 
     await UsersService.update(id, { refreshToken });
@@ -76,7 +71,6 @@ export class AuthService {
     }
 
     const { id, role } = user;
-
     const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
 
     await UsersService.update(id, { refreshToken });
