@@ -9,14 +9,17 @@ export class UsersRepository {
   };
 
   static create = async (userData: CreateUserData): Promise<User> => {
-    const user = User.create(userData as DeepPartial<User>);
-    const createdUser = await User.save(user);
-    return createdUser;
+    const createdUser = User.create(userData as DeepPartial<User>);
+    const savedUser = await User.save(createdUser);
+
+    return savedUser;
   };
 
   static update = async (currentUser: User, id: number, userData: UpdateUserData): Promise<User> => {
     await User.update({ id }, { ...currentUser, ...userData });
+
     const updatedUser = (await UsersRepository.findOneByCondition({ id })) as User;
+
     return updatedUser;
   };
 }

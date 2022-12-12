@@ -17,12 +17,13 @@ export class UsersService {
       throw new NotFoundError('Language not found.');
     }
 
-    const userWithCurrentNormalizedEmail = await UsersService.findOneByCondition({ normalizedEmail: userData.normalizedEmail });
-    if (userWithCurrentNormalizedEmail) {
+    const user = await UsersService.findOneByCondition({ normalizedEmail: userData.normalizedEmail });
+    if (user) {
       throw new BadRequestError('The user with the specified email already exists.');
     }
 
     const createdUser = await UsersRepository.create(userData);
+
     return createdUser;
   };
 
@@ -41,6 +42,7 @@ export class UsersService {
     }
 
     const updatedUser = await UsersRepository.update(updatableUser, userId, userData);
+
     return updatedUser;
   };
 }

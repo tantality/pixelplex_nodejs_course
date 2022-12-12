@@ -23,6 +23,7 @@ export class LanguagesRepository {
     });
 
     const [languages, count] = languagesAndTheirNumber;
+
     return { count, languages };
   };
 
@@ -32,14 +33,17 @@ export class LanguagesRepository {
   };
 
   static create = async (body: CreateLanguageBody): Promise<Language> => {
-    const language = Language.create(body as DeepPartial<Language>);
-    const createdLanguage = await Language.save(language);
-    return createdLanguage;
+    const createdLanguage = Language.create(body as DeepPartial<Language>);
+    const savedLanguage = await Language.save(createdLanguage);
+
+    return savedLanguage;
   };
 
   static update = async (currentLanguage: Language, id: number, body: UpdateLanguageBody): Promise<Language> => {
     await Language.update({ id }, { ...currentLanguage, ...body });
+
     const updatedLanguage = (await LanguagesRepository.findOneByCondition({ id })) as Language;
+
     return updatedLanguage;
   };
 

@@ -11,6 +11,7 @@ export class UsersController {
       if (!user) {
         throw new NotFoundError('User not found.');
       }
+
       res.status(200).json(new UserDTO(user));
     } catch (err) {
       next(err);

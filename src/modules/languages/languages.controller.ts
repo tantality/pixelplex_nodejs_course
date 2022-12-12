@@ -31,6 +31,7 @@ export class LanguagesController {
       if (!language) {
         throw new NotFoundError('Language not found.');
       }
+
       res.status(200).json(new LanguageDTO(language));
     } catch (err) {
       next(err);
