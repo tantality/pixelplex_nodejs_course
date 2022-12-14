@@ -11,7 +11,6 @@ import {
   AddAnswerToTaskResponse,
   GetTasksCommon,
   GetStatisticsCommon,
-  CreateTaskCommon,
 } from './types';
 
 export class TasksController {
@@ -35,8 +34,8 @@ export class TasksController {
 
   static createTask = async (req: CreateTaskRequest, res: CreateTaskResponse, next: NextFunction): Promise<void> => {
     try {
-      const task = await TasksService.create(req);
-      res.status(201).json(task as CreateTaskCommon);
+      const task = await TasksService.create(req.userId as number, req.body);
+      res.status(201).json(task);
     } catch (err) {
       next(err);
     }

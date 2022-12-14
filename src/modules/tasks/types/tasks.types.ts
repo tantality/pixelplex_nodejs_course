@@ -24,3 +24,5 @@ export enum TASK_TYPE {
 export enum TASK_SORT_BY {
   DATE = 'date',
 }
+
+export type CreateTaskData = Pick<ITask, 'hiddenWordId' | 'userId' | 'type'>;
