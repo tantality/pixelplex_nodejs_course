@@ -1,18 +1,59 @@
+import {
+  Entity,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Relation,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import { Language } from '../languages/language.entity';
+import { User } from '../users/user.entity';
 import { ICard } from './types';
 
-let cardCounter = 1;
+@Index(['nativeLanguageId', 'foreignLanguageId'])
+@Entity('cards')
+export class Card extends BaseEntity implements ICard {
+  @PrimaryGeneratedColumn()
+    id!: number;
 
-export class Card implements ICard {
-  id: number;
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'userId',
+  })
+    user!: Relation<User>;
 
-  constructor(
-    public readonly userId: number,
-    public readonly nativeLanguageId: number,
-    public readonly foreignLanguageId: number,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {
-    this.id = cardCounter;
-    cardCounter += 1;
-  }
+  @Index()
+  @Column()
+    userId!: number;
+
+  @ManyToOne(() => Language)
+  @JoinColumn({
+    name: 'nativeLanguageId',
+  })
+    nativeLanguage!: Relation<Language>;
+
+  @Column()
+    nativeLanguageId!: number;
+
+  @ManyToOne(() => Language)
+  @JoinColumn({
+    name: 'foreignLanguageId',
+  })
+    foreignLanguage!: Relation<Language>;
+
+  @Column()
+    foreignLanguageId!: number;
+
+  @Index()
+  @CreateDateColumn()
+    createdAt!: Date;
+
+  @UpdateDateColumn()
+    updatedAt!: Date;
 }

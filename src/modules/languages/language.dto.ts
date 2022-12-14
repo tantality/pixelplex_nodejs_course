@@ -1,3 +1,4 @@
+import { Language } from './language.entity';
 import { ILanguage } from './types';
 
 export class LanguageDTO implements Omit<ILanguage, 'updatedAt'> {
@@ -5,7 +6,7 @@ export class LanguageDTO implements Omit<ILanguage, 'updatedAt'> {
   public readonly name: string;
   public readonly code: string;
   public readonly createdAt: Date;
-  constructor(language: ILanguage) {
+  constructor(language: Language) {
     this.id = language.id;
     this.name = language.name;
     this.code = language.code;

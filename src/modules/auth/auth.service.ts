@@ -1,31 +1,84 @@
-/* eslint-disable require-await */
-import { Request } from 'express';
-import { logRequest } from '../../utils';
-import { User } from '../users/user.entity';
-import { AuthDTO } from './auth.dto';
-import { SignUpRequest, LogInRequest } from './types';
-
-const user = new User(1, 'Angelina', 'email@gmail.com', 'email@gmail.com', 'qwerty123', 'user', 'awdwkmkwad243', new Date(), new Date());
-const authDTO = new AuthDTO(user, 'amdwiwnf');
+import normalizeEmail from 'normalize-email';
+import * as bcrypt from 'bcrypt';
+import { BadRequestError, NotFoundError, UnauthorizedError } from '../../errors';
+import { UsersService } from '../users/users.service';
+import { IAuth, LogInBody, SignUpBody } from './types';
+import { JWTService } from './jwt.service';
+import { SALT_ROUNDS } from './auth.constants';
 
 export class AuthService {
-  static signUp = async (req: SignUpRequest): Promise<AuthDTO> => {
-    logRequest(req);
-    return authDTO;
+  static signUp = async (body: SignUpBody): Promise<IAuth> => {
+    const normalizedEmail = normalizeEmail(body.email);
+    const user = await UsersService.findOneByCondition({ normalizedEmail });
+    if (user) {
+      throw new BadRequestError('The user with the specified email already exists.');
+    }
+
+    const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
+    const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
+    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+
+    await UsersService.update(id, { refreshToken });
+
+    return {
+      id,
+      accessToken,
+      refreshToken,
+    };
   };
 
-  static logIn = async (req: LogInRequest): Promise<AuthDTO> => {
-    logRequest(req);
-    return authDTO;
+  static logIn = async ({ email, password }: LogInBody): Promise<IAuth> => {
+    const normalizedEmail = normalizeEmail(email);
+    const user = await UsersService.findOneByCondition({ normalizedEmail });
+    if (!user) {
+      throw new NotFoundError('The user with the specified email does not exist.');
+    }
+
+    const isPasswordsEquals = await bcrypt.compare(password, user.password);
+    if (!isPasswordsEquals) {
+      throw new UnauthorizedError('Invalid password');
+    }
+
+    const { id, role } = user;
+    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+
+    await UsersService.update(id, { refreshToken });
+
+    return {
+      id,
+      accessToken,
+      refreshToken,
+    };
   };
 
-  static logOut = async (req: Request): Promise<number> => {
-    logRequest(req);
-    return 1;
+  static logOut = async (userId: number): Promise<void> => {
+    await UsersService.update(userId, { refreshToken: null });
   };
 
-  static refresh = async (req: Request): Promise<AuthDTO> => {
-    logRequest(req);
-    return authDTO;
+  static refresh = async (refreshTokenReceived?: string): Promise<IAuth> => {
+    if (!refreshTokenReceived) {
+      throw new UnauthorizedError('Refresh token is missing');
+    }
+
+    const user = await UsersService.findOneByCondition({ refreshToken: refreshTokenReceived });
+    if (!user) {
+      throw new NotFoundError('Refresh token not found.');
+    }
+
+    const verifiedRefreshToken = JWTService.validateRefreshToken(refreshTokenReceived);
+    if (!verifiedRefreshToken) {
+      throw new UnauthorizedError('Refresh token is invalid.');
+    }
+
+    const { id, role } = user;
+    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+
+    await UsersService.update(id, { refreshToken });
+
+    return {
+      id,
+      accessToken,
+      refreshToken,
+    };
   };
 }

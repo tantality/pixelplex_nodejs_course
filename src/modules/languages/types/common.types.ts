@@ -1,3 +1,3 @@
-import { LanguageDTO } from '../language.dto';
+import { Language } from '../language.entity';
 
-export type GetLanguagesCommon = { count: number; languages: LanguageDTO[] };
+export type GetLanguagesCommon = { count: number; languages: Language[] };

@@ -1,11 +1,10 @@
 import { IWord } from './types';
+import { Word } from './word.entity';
 
-type PartialWord = Pick<IWord, 'id' | 'value'>;
-
-export class WordDTO implements PartialWord {
+export class WordDTO implements Pick<IWord, 'id' | 'value'> {
   public readonly id: number;
   public readonly value: string;
-  constructor(word: IWord | PartialWord) {
+  constructor(word: Word) {
     this.id = word.id;
     this.value = word.value;
   }

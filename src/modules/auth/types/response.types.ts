@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { AuthDTO } from '../auth.dto';
+import { IAuth } from './auth.types';
 
-export type SignUpResponse = Response<AuthDTO>;
-export type LogInResponse = Response<AuthDTO>;
+export type SignUpResponse = Response<IAuth>;
+export type LogInResponse = Response<IAuth>;
 export type LogOutResponse = Response<{ id: number }>;
-export type RefreshTokensResponse = Response<AuthDTO>;
+export type RefreshTokensResponse = Response<IAuth>;
