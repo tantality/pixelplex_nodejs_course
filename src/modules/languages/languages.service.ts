@@ -1,6 +1,7 @@
 import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
+import { CardsService } from '../cards/cards.service';
 import { GetLanguagesCommon, UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
 import { LanguagesRepository } from './languages.repository';
@@ -65,9 +66,10 @@ export class LanguagesService {
       throw new NotFoundError('Language not found.');
     }
 
-    const languageIsUsedInUsers = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
-    if (languageIsUsedInUsers) {
-      throw new BadRequestError('The language cannot be deleted because it is set as the user\'s native language.');
+    const userLanguage = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
+    const cardLanguage = await CardsService.findOneWithLanguage(languageId);
+    if (userLanguage || cardLanguage ) {
+      throw new BadRequestError('The language cannot be deleted because it is used in the card(s) or / and is set as the user\'s native language.');
     }
 
     await LanguagesRepository.delete(languageId);

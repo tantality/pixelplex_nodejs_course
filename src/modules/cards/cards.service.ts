@@ -10,20 +10,19 @@ import { GetCardsCommon, CreateCardBody, UpdateCardBody, GetCardsQuery } from '.
 import { WordsService } from './words.service';
 
 export class CardsService {
-  static findAndCountAll = async (
-    userId: number,
-    query: GetCardsQuery,
-  ): Promise<GetCardsCommon> => {
-    const cardsAndTheirNumber = await CardsRepository.findAndCountAll(
-      userId,
-      query,
-    );
+  static findAndCountAll = async (userId: number, query: GetCardsQuery): Promise<GetCardsCommon> => {
+    const cardsAndTheirNumber = await CardsRepository.findAndCountAll(userId, query);
 
     return cardsAndTheirNumber;
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Card>): Promise<Card | null> => {
     const card = await CardsRepository.findOneByCondition(whereCondition);
+    return card;
+  };
+
+  static findOneWithLanguage = async (languageId: number): Promise<Card | null> => {
+    const card = await CardsRepository.findOneWithLanguage(languageId);
     return card;
   };
 

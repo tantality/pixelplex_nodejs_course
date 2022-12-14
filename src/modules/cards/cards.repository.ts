@@ -42,10 +42,7 @@ export class CardsRepository {
     return wordIds.map((id, ind) => ({ id, value: wordValues[ind] }));
   };
 
-  private static getQueryStringForWords = (
-    userId: number,
-    nameOfLanguageId: 'foreignLanguageId' | 'nativeLanguageId',
-  ): string => {
+  private static getQueryStringForWords = (userId: number, nameOfLanguageId: 'foreignLanguageId' | 'nativeLanguageId'): string => {
     return `
     (
       SELECT "w"."id" AS "id", "w"."value" AS "value", "w"."cardId" AS "cardId"
@@ -136,6 +133,17 @@ export class CardsRepository {
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Card>): Promise<Card | null> => {
     const card = await Card.findOneBy(whereCondition);
+    return card;
+  };
+
+  static findOneWithLanguage = async (languageId: number): Promise<Card | null> => {
+    const card = await AppDataSource.createQueryBuilder()
+      .select('card')
+      .from(Card, 'card')
+      .where('card.nativeLanguageId = :nativeLanguageId', { nativeLanguageId: languageId })
+      .orWhere('card.foreignLanguageId = :foreignLanguageId', { foreignLanguageId: languageId })
+      .getOne();
+
     return card;
   };
 
