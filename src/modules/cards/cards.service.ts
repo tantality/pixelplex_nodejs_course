@@ -1,44 +1,25 @@
-/* eslint-disable require-await */
 import { FindOptionsWhere } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
-import { logRequest } from '../../utils';
 import { LanguagesService } from '../languages/languages.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardsRepository } from './cards.repository';
-import { GetCardsRequest, GetCardsCommon, CreateCardBody, UpdateCardBody } from './types';
-import { WordDTO } from './word.dto';
-import { Word } from './word.entity';
+import { GetCardsCommon, CreateCardBody, UpdateCardBody, GetCardsQuery } from './types';
 import { WordsService } from './words.service';
 
-const word = new Word();
-word.id = 1;
-word.value = 'wd';
-word.languageId = 2;
-word.cardId = 2;
-word.createdAt = new Date();
-word.updatedAt = new Date();
-
-const nativeWordDTO = new WordDTO(word);
-const foreignWordDTO = new WordDTO(word);
-
-const card = new Card();
-card.foreignLanguageId = 14;
-card.nativeLanguageId = 16;
-card.userId = 47;
-card.createdAt = new Date();
-card.updatedAt = new Date();
-const cardDTO = new CardDTO(card, [nativeWordDTO], [foreignWordDTO]);
-
 export class CardsService {
-  static findAll = async (req: GetCardsRequest): Promise<GetCardsCommon | null> => {
-    logRequest(req);
-    return {
-      count: 30,
-      cards: [cardDTO],
-    };
+  static findAndCountAll = async (
+    userId: number,
+    query: GetCardsQuery,
+  ): Promise<GetCardsCommon> => {
+    const cardsAndTheirNumber = await CardsRepository.findAndCountAll(
+      userId,
+      query,
+    );
+
+    return cardsAndTheirNumber;
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Card>): Promise<Card | null> => {
