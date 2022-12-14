@@ -5,6 +5,7 @@ import { Language } from '../modules/languages/language.entity';
 import * as Migrations from '../migrations';
 import { Card } from '../modules/cards/card.entity';
 import { Word } from '../modules/cards/word.entity';
+import { Task } from '../modules/tasks/task.entity';
 
 dotenv.config();
 
@@ -15,9 +16,9 @@ export const DB: DataSourceOptions = {
   username: 'postgres',
   password: process.env.DB_PASSWORD,
   database: 'flashcards',
-  synchronize: true,
+  synchronize: false,
   logging: false,
-  entities: [Language, User, Card, Word],
+  entities: [Language, User, Card, Word, Task],
   migrations: Object.values(Migrations),
   migrationsRun: true,
 };

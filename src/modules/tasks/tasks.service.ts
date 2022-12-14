@@ -21,7 +21,17 @@ language.name = 'ru';
 language.createdAt = new Date();
 language.updatedAt = new Date();
 const languageDTO = new LanguageDTO(language);
-const task = new Task(1, 1, 'to_foreign', 'correct', ['привет'], 'привет', new Date(), new Date());
+
+const task = new Task();
+task.id = 1;
+task.userId = 1;
+task.hiddenWordId = 1;
+task.type = 'to_foreign';
+task.status = 'correct';
+task.correctAnswers = ['привет'];
+task.receivedAnswer = 'привет';
+task.createdAt = new Date();
+task.updatedAt = new Date();
 const taskDTO = new TaskDTO(task, 'hello', 1, 2);
 
 export class TasksService {
