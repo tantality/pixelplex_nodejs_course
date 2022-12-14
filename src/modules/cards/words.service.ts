@@ -13,6 +13,10 @@ export class WordsService {
     return preparedWords;
   };
 
+  private static getWordDTOs = (words: Word[]): WordDTO[] => {
+    return words.map((word) => new WordDTO(word));
+  };
+
   static findAllByCondition = async (whereCondition: FindOptionsWhere<Word>): Promise<Word[] | null> => {
     const words = await WordsRepository.findAllByCondition(whereCondition);
     return words;
@@ -21,14 +25,14 @@ export class WordsService {
   static create = async (wordsData: CreateWordsData): Promise<WordDTO[]> => {
     const preparedWords: WordToCreate[] = WordsService.prepareWordsToCreate(wordsData);
     const createdWords = await WordsRepository.create(preparedWords);
-    const createdWordsDTOs = createdWords.map((word) => new WordDTO(word));
+    const createdWordsDTOs = WordsService.getWordDTOs(createdWords);
 
     return createdWordsDTOs;
   };
 
   static updateLanguageId = async (cardId: number, oldLanguageId: number, newLanguageId: number): Promise<WordDTO[]> => {
     const updatedWords = await WordsRepository.updateLanguageId(cardId, oldLanguageId, newLanguageId);
-    return updatedWords.map((word) => new WordDTO(word));
+    return WordsService.getWordDTOs(updatedWords);
   };
 
   static update = async (cardLanguageId: number, wordsData: UpdateWordsData): Promise<WordDTO[]> => {
@@ -47,7 +51,7 @@ export class WordsService {
       updatedWords = await WordsRepository.update(cardLanguageId, preparedWords);
     }
 
-    updatedWordsDTOs = updatedWords.map((word) => new WordDTO(word));
+    updatedWordsDTOs = WordsService.getWordDTOs(updatedWords);
 
     return updatedWordsDTOs;
   };
