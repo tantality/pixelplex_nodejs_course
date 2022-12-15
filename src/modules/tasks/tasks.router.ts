@@ -27,7 +27,7 @@ router.post(
   checkSchema(TasksValidation.addAnswerToTask),
   validatePayload<AddAnswerToTaskRequest>,
   isAuth<AddAnswerToTaskRequest>,
-  TasksController.addAnswerToTask,
+  TasksController.updateTask,
 );
 
 export function mountTasksRouter(app: Application): void {

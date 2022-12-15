@@ -1,3 +1,5 @@
+import { WordValueWithCardLanguages } from '../../cards/types';
+
 export interface ITask {
   id: number;
   userId: number;
@@ -26,3 +28,4 @@ export enum TASK_SORT_BY {
 }
 
 export type CreateTaskData = Pick<ITask, 'hiddenWordId' | 'userId' | 'type'>;
+export type TaskIdWithWordData = { id: number; hiddenWord: WordValueWithCardLanguages };

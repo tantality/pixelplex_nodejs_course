@@ -34,17 +34,17 @@ export class TasksController {
 
   static createTask = async (req: CreateTaskRequest, res: CreateTaskResponse, next: NextFunction): Promise<void> => {
     try {
-      const task = await TasksService.create(req.userId as number, req.body);
-      res.status(201).json(task);
+      const createdTask = await TasksService.create(req.userId as number, req.body);
+      res.status(201).json(createdTask);
     } catch (err) {
       next(err);
     }
   };
 
-  static addAnswerToTask = async (req: AddAnswerToTaskRequest, res: AddAnswerToTaskResponse, next: NextFunction): Promise<void> => {
+  static updateTask = async (req: AddAnswerToTaskRequest, res: AddAnswerToTaskResponse, next: NextFunction): Promise<void> => {
     try {
-      const task = await TasksService.addAnswer(req);
-      res.status(201).json(task);
+      const updatedTask = await TasksService.update(req.userId as number, req.params.taskId, req.body);
+      res.status(201).json(updatedTask);
     } catch (err) {
       next(err);
     }

@@ -1,5 +1,5 @@
-import { FindOptionsWhere } from 'typeorm';
-import { CreateWordsData, UpdateWordsData, WordToCreate } from './types';
+import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
+import { CreateWordsData, FindAnswersQueryResult, UpdateWordsData, WordToCreate } from './types';
 import { WordDTO } from './word.dto';
 import { Word } from './word.entity';
 import { WordsRepository } from './words.repository';
@@ -20,6 +20,29 @@ export class WordsService {
   static findAllByCondition = async (whereCondition: FindOptionsWhere<Word>): Promise<Word[] | null> => {
     const words = await WordsRepository.findAllByCondition(whereCondition);
     return words;
+  };
+
+  static findOneWithJoinedCard = async (id: number): Promise<Word | null> => {
+    const word = await WordsRepository.findOneWithJoinedCard(id);
+    return word;
+  };
+
+  static findCardIdsByConditionQueryBuilder = (
+    userId: number,
+    nativeLanguageId: number,
+    foreignLanguageId: number,
+    value: string,
+  ): SelectQueryBuilder<Word> => {
+    const queryBuilder = WordsRepository.findCardIdsByConditionQueryBuilder(userId, nativeLanguageId, foreignLanguageId, value);
+    return queryBuilder;
+  };
+
+  static findCorrectAnswersToTask = async (cardIdsQueryBuilder: SelectQueryBuilder<Word>, languageId: number): Promise<string[]> => {
+    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(cardIdsQueryBuilder, languageId);
+    if (!answers) {
+      return [];
+    }
+    return answers;
   };
 
   static create = async (wordsData: CreateWordsData): Promise<WordDTO[]> => {

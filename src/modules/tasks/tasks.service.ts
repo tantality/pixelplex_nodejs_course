@@ -1,7 +1,9 @@
 /* eslint-disable require-await */
+import { FindOptionsWhere } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
 import { logRequest } from '../../utils';
 import { Word } from '../cards/word.entity';
+import { WordsService } from '../cards/words.service';
 import { LanguageDTO } from '../languages/language.dto';
 import { Language } from '../languages/language.entity';
 import { LanguagesService } from '../languages/languages.service';
@@ -16,9 +18,11 @@ import {
   GetStatisticsCommon,
   GetStatisticsRequest,
   CreateTaskCommon,
-  AddAnswerToTaskRequest,
   CreateTaskBody,
   TASK_TYPE,
+  AddAnswerToTaskBody,
+  TASK_STATUS,
+  TaskIdWithWordData,
 } from './types';
 
 const language = new Language();
@@ -48,6 +52,11 @@ export class TasksService {
       count: 30,
       tasks: [taskDTO],
     };
+  };
+
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Task>): Promise<Task | null> => {
+    const task = await TasksRepository.findOneByCondition(whereCondition);
+    return task;
   };
 
   static calculateStatistics = async (req: GetStatisticsRequest): Promise<GetStatisticsCommon | null> => {
@@ -115,8 +124,53 @@ export class TasksService {
     };
   };
 
-  static addAnswer = async (req: AddAnswerToTaskRequest): Promise<TaskDTO> => {
-    logRequest(req);
-    return taskDTO;
+  static findCorrectAnswers = async (hiddenWordId: number, userId: number, type: string): Promise<string[]> => {
+    const {
+      value,
+      card: { nativeLanguageId, foreignLanguageId },
+    } = (await WordsService.findOneWithJoinedCard(hiddenWordId)) as Word;
+
+    const languageId = type === TASK_TYPE.TO_NATIVE ? nativeLanguageId : foreignLanguageId;
+    const cardIdsQueryBuilder = WordsService.findCardIdsByConditionQueryBuilder(userId, nativeLanguageId, foreignLanguageId, value);
+    const answers = await WordsService.findCorrectAnswersToTask(cardIdsQueryBuilder, languageId);
+
+    return answers;
+  };
+
+  static getTaskStatus = (correctAnswers: string[], receivedAnswer: string): string => {
+    const isReceivedAnswerCorrect = correctAnswers.includes(receivedAnswer);
+    if (isReceivedAnswerCorrect) {
+      return TASK_STATUS.CORRECT;
+    } else {
+      return TASK_STATUS.INCORRECT;
+    }
+  };
+
+  static update = async (userId: number, taskId: number, { answer }: AddAnswerToTaskBody): Promise<TaskDTO> => {
+    const task = await TasksService.findOneByCondition({ id: taskId, userId });
+    if (!task) {
+      throw new NotFoundError('Task not found');
+    }
+
+    if (task.status !== TASK_STATUS.UNANSWERED) {
+      throw new BadRequestError('The answer has already been recorded for the task');
+    }
+
+    const { id, hiddenWordId, type } = task;
+
+    const correctAnswers = await TasksService.findCorrectAnswers(hiddenWordId, userId, type);
+    const status = TasksService.getTaskStatus(correctAnswers, answer);
+    const updatedTask = await TasksRepository.update(id, correctAnswers, answer, status);
+
+    const {
+      hiddenWord: {
+        value,
+        card: { nativeLanguageId, foreignLanguageId },
+      },
+    } = (await TasksRepository.findOneForDTO(id)) as TaskIdWithWordData;
+
+    const updatedTaskDTO = new TaskDTO(updatedTask, value, nativeLanguageId, foreignLanguageId);
+
+    return updatedTaskDTO;
   };
 }
