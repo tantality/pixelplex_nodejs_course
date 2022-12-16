@@ -6,4 +6,3 @@ export type GetLanguagesResponse = Response<GetLanguagesCommon>;
 export type GetOneLanguageResponse = Response<LanguageDTO>;
 export type CreateLanguageResponse = Response<LanguageDTO>;
 export type UpdateLanguageResponse = Response<LanguageDTO>;
-export type DeleteLanguageResponse = Response<{ id: number }>;
