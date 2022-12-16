@@ -1,6 +1,6 @@
 import { DeepPartial, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { Language } from './language.entity';
-import { CreateLanguageBody, GetLanguagesCommon, UpdateLanguageBody } from './types';
+import { CreateLanguageBody, UpdateLanguageBody } from './types';
 
 export class LanguagesRepository {
   static findAndCountAll = async (
@@ -8,7 +8,7 @@ export class LanguagesRepository {
     take: number,
     whereCondition: FindOptionsWhere<Language>,
     orderCondition: FindOptionsOrder<Language>,
-  ): Promise<GetLanguagesCommon> => {
+  ): Promise<{ count: number; languages: Language[] }> => {
     const [languages, count] = await Language.findAndCount({
       select: {
         id: true,

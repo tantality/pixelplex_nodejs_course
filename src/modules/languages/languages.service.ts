@@ -1,14 +1,20 @@
 import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
-import { GetLanguagesCommon, UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
+import { UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
 import { LanguagesRepository } from './languages.repository';
 import { Language } from './language.entity';
 import { getSortingCondition } from './utils';
 
 export class LanguagesService {
-  static findAndCountAll = async ({ search, sortBy, sortDirection, limit, offset }: GetLanguagesQuery): Promise<GetLanguagesCommon> => {
+  static findAndCountAll = async ({
+    search,
+    sortBy,
+    sortDirection,
+    limit,
+    offset,
+  }: GetLanguagesQuery): Promise<{ count: number; languages: Language[] }> => {
     let whereCondition: FindOptionsWhere<Language> = {};
     if (search) {
       whereCondition = {
