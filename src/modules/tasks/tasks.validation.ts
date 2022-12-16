@@ -83,7 +83,7 @@ export class TasksValidation {
           const fromDate = req.query?.fromDate;
           const tryParseFromDate = Date.parse(fromDate);
           if (
-            (tryParseFromDate && fromDate >= toDate && !TasksValidation.isInvalidDate(fromDate)) ||
+            (tryParseFromDate && !TasksValidation.isInvalidDate(fromDate) && fromDate >= toDate) ||
             TasksValidation.isInvalidDate(toDate)
           ) {
             throw new Error();
