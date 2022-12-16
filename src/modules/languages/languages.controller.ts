@@ -1,4 +1,4 @@
-import { NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { NotFoundError } from '../../errors';
 import {
   CreateLanguageRequest,
@@ -7,7 +7,6 @@ import {
   GetOneLanguageRequest,
   UpdateLanguageRequest,
   CreateLanguageResponse,
-  DeleteLanguageResponse,
   GetLanguagesResponse,
   GetOneLanguageResponse,
   UpdateLanguageResponse,
@@ -56,10 +55,10 @@ export class LanguagesController {
     }
   };
 
-  static deleteLanguage = async (req: DeleteLanguageRequest, res: DeleteLanguageResponse, next: NextFunction): Promise<void> => {
+  static deleteLanguage = async (req: DeleteLanguageRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const idOfDeletedLanguage = await LanguagesService.delete(req.params.languageId);
-      res.status(200).json({ id: idOfDeletedLanguage });
+      await LanguagesService.delete(req.params.languageId);
+      res.status(200).json();
     } catch (err) {
       next(err);
     }
