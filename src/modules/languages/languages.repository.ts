@@ -9,7 +9,7 @@ export class LanguagesRepository {
     whereCondition: FindOptionsWhere<Language>,
     orderCondition: FindOptionsOrder<Language>,
   ): Promise<GetLanguagesCommon> => {
-    const languagesAndTheirNumber = await Language.findAndCount({
+    const [languages, count] = await Language.findAndCount({
       select: {
         id: true,
         code: true,
@@ -21,8 +21,6 @@ export class LanguagesRepository {
       skip,
       take,
     });
-
-    const [languages, count] = languagesAndTheirNumber;
 
     return { count, languages };
   };
