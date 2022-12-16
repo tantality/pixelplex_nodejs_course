@@ -9,15 +9,14 @@ import {
   CreateTaskResponse,
   AddAnswerToTaskRequest,
   AddAnswerToTaskResponse,
-  GetTasksCommon,
   GetStatisticsCommon,
 } from './types';
 
 export class TasksController {
   static getTasks = async (req: GetTasksRequest, res: GetTasksResponse, next: NextFunction): Promise<void> => {
     try {
-      const tasks = await TasksService.findAll(req);
-      res.status(200).json(tasks as GetTasksCommon);
+      const tasks = await TasksService.findAndCountAll(req.userId as number, req.query);
+      res.status(200).json(tasks);
     } catch (err) {
       next(err);
     }

@@ -53,7 +53,6 @@ export class Task extends BaseEntity implements ITask {
   @Column({ type: 'varchar', length: MAX_STRING_LENGTH, array: true, nullable: true })
     correctAnswers!: string[];
 
-  @Index()
   @Column({ type: 'varchar', length: MAX_STRING_LENGTH, nullable: true })
     receivedAnswer!: string;
 

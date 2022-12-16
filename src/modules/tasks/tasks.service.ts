@@ -1,5 +1,5 @@
 /* eslint-disable require-await */
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
 import { logRequest } from '../../utils';
 import { Word } from '../cards/word.entity';
@@ -13,8 +13,6 @@ import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
 import {
-  GetTasksRequest,
-  GetTasksCommon,
   GetStatisticsCommon,
   GetStatisticsRequest,
   CreateTaskCommon,
@@ -23,6 +21,7 @@ import {
   AddAnswerToTaskBody,
   TASK_STATUS,
   TaskIdWithWordData,
+  GetTasksQuery,
 } from './types';
 
 const language = new Language();
@@ -33,25 +32,56 @@ language.createdAt = new Date();
 language.updatedAt = new Date();
 const languageDTO = new LanguageDTO(language);
 
-const task = new Task();
-task.id = 1;
-task.userId = 1;
-task.hiddenWordId = 1;
-task.type = 'to_foreign';
-task.status = 'correct';
-task.correctAnswers = ['привет'];
-task.receivedAnswer = 'привет';
-task.createdAt = new Date();
-task.updatedAt = new Date();
-const taskDTO = new TaskDTO(task, 'hello', 1, 2);
-
 export class TasksService {
-  static findAll = async (req: GetTasksRequest): Promise<GetTasksCommon | null> => {
-    logRequest(req);
-    return {
-      count: 30,
-      tasks: [taskDTO],
-    };
+  static findAndCountAll = async (
+    userId: number,
+    { search, sortDirection, limit, offset, taskStatus, languageId }: GetTasksQuery,
+  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
+    const whereCondition: FindOptionsWhere<Task>[] = [];
+    let baseCondition: FindOptionsWhere<Task> = { userId, hiddenWord: {} as FindOptionsWhere<Word> };
+
+    if (search) {
+      baseCondition = {
+        ...baseCondition,
+        hiddenWord: {
+          value: ILike(`%${search}%`),
+        },
+      };
+    }
+
+    if (taskStatus) {
+      baseCondition = { ...baseCondition, status: taskStatus };
+    }
+
+    let taskWithNativeLanguageCondition: FindOptionsWhere<Task> | null = null;
+    let taskWithForeignLanguageCondition: FindOptionsWhere<Task> | null = null;
+
+    if (languageId) {
+      taskWithNativeLanguageCondition = {
+        hiddenWord: {
+          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
+          card: {
+            nativeLanguageId: languageId,
+          },
+        } as FindOptionsWhere<Word>,
+      } as FindOptionsWhere<Task>;
+
+      taskWithForeignLanguageCondition = {
+        hiddenWord: {
+          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
+          card: {
+            foreignLanguageId: languageId,
+          },
+        } as FindOptionsWhere<Word>,
+      } as FindOptionsWhere<Task>;
+    }
+
+    whereCondition.push({ ...baseCondition, ...taskWithNativeLanguageCondition });
+    whereCondition.push({ ...baseCondition, ...taskWithForeignLanguageCondition });
+
+    const tasksAndTheirNumber = await TasksRepository.findAndCountAll(offset, limit, sortDirection, whereCondition);
+
+    return tasksAndTheirNumber;
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Task>): Promise<Task | null> => {

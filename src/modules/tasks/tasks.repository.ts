@@ -1,15 +1,55 @@
-import { DeepPartial, FindOptionsWhere } from 'typeorm';
+import { DeepPartial, FindOptionsOrderValue, FindOptionsWhere } from 'typeorm';
+import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
 import { CreateTaskData, TaskIdWithWordData } from './types';
+import { getTasksAndTheirNumber } from './utils';
 
 export class TasksRepository {
+  static findAndCountAll = async (
+    skip: number,
+    take: number,
+    sortDirection: string,
+    whereCondition: FindOptionsWhere<Task>[],
+  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
+    const tasksAndTheirNumberQueryResult = await Task.findAndCount({
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        hiddenWord: {
+          value: true,
+          card: {
+            nativeLanguageId: true,
+            foreignLanguageId: true,
+          },
+        },
+        correctAnswers: true,
+        receivedAnswer: true,
+        createdAt: true,
+      },
+      relations: {
+        hiddenWord: {
+          card: true,
+        },
+      },
+      where: whereCondition,
+      order: {
+        createdAt: sortDirection as FindOptionsOrderValue,
+      },
+      skip,
+      take,
+    });
+
+    return getTasksAndTheirNumber(tasksAndTheirNumberQueryResult);
+  };
+
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Task>): Promise<Task | null> => {
     const task = await Task.findOneBy(whereCondition);
     return task;
   };
 
   static findOneForDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
-    const task: TaskIdWithWordData | null = await Task.createQueryBuilder('task')
+    const task = await Task.createQueryBuilder('task')
       .select(['task.id', 'card.nativeLanguageId', 'card.foreignLanguageId', 'word.value'])
       .leftJoin('task.hiddenWord', 'word')
       .leftJoin('word.card', 'card')
