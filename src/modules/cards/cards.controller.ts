@@ -1,4 +1,4 @@
-import { NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { CardsService } from './cards.service';
 import {
   GetCardsRequest,
@@ -8,7 +8,6 @@ import {
   UpdateCardRequest,
   UpdateCardResponse,
   DeleteCardRequest,
-  DeleteCardResponse,
   GetCardsCommon,
 } from './types';
 
@@ -40,10 +39,10 @@ export class CardsController {
     }
   };
 
-  static deleteCard = async (req: DeleteCardRequest, res: DeleteCardResponse, next: NextFunction): Promise<void> => {
+  static deleteCard = async (req: DeleteCardRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const idOfDeletedCard = await CardsService.delete(req.userId as number, req.params.cardId);
-      res.status(200).json({ id: idOfDeletedCard });
+      await CardsService.delete(req.userId as number, req.params.cardId);
+      res.status(200).json();
     } catch (err) {
       next(err);
     }
