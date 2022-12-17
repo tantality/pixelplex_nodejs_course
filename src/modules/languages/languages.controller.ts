@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { NotFoundError } from '../../errors';
+import { LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
 import {
   CreateLanguageRequest,
   DeleteLanguageRequest,
@@ -28,7 +28,7 @@ export class LanguagesController {
     try {
       const language = await LanguagesService.findOneByCondition({ id: req.params.languageId });
       if (!language) {
-        throw new NotFoundError('Language not found.');
+        throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
       }
 
       res.status(200).json(new LanguageDTO(language));
