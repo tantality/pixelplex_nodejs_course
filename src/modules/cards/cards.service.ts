@@ -22,13 +22,8 @@ export class CardsService {
     return cardsAndTheirNumber;
   };
 
-  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card>): Promise<Card | null> => {
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[] ): Promise<Card | null> => {
     const card = await CardsRepository.findOneByCondition(whereCondition);
-    return card;
-  };
-
-  static findOneWithLanguage = async (languageId: number): Promise<Card | null> => {
-    const card = await CardsRepository.findOneWithLanguage(languageId);
     return card;
   };
 
