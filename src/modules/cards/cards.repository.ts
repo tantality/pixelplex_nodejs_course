@@ -2,10 +2,10 @@ import { FindOptionsWhere } from 'typeorm';
 import AppDataSource from '../../data-source';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
-import { CardToTransform, CARD_SORT_BY, GetCardsCommon, GetCardsQuery } from './types';
+import { CardToTransform, CARD_SORT_BY, GetCardsQuery } from './types';
 
 export class CardsRepository {
-  private static getCardsAndTheirCount = (queryResult: [{ cards: CardToTransform[]; count: string }]): GetCardsCommon => {
+  private static getCardsAndTheirCount = (queryResult: [{ cards: CardToTransform[]; count: string }]): { count: number; cards: CardDTO[] } => {
     if (!queryResult.length) {
       return { count: 0, cards: [] };
     }
@@ -65,7 +65,7 @@ export class CardsRepository {
   static findAndCountAll = async (
     userId: number,
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
-  ): Promise<GetCardsCommon> => {
+  ): Promise<{ count: number; cards: CardDTO[] }> => {
     let languageIdCondition = '';
     if (typeof languageId === 'number') {
       languageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
