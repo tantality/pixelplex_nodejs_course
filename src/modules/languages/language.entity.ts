@@ -1,5 +1,5 @@
 import { Entity, Column, Index, OneToMany, Relation } from 'typeorm';
-import { CommonEntity } from '../../common-entity';
+import { CommonEntity } from '../../entity';
 import { User } from '../users/user.entity';
 import { MAX_CODE_LENGTH, MAX_NAME_LENGTH } from './languages.constants';
 

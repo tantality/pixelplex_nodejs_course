@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, Relation } from 'typeorm';
-import { CommonEntity } from '../../common-entity';
+import { CommonEntity } from '../../entity';
 import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
 import { MAX_NAME_LENGTH } from '../auth/auth.constants';
 import { Language } from '../languages/language.entity';
