@@ -29,7 +29,7 @@ export class AuthController {
       await AuthService.logOut(req.userId as number);
 
       res.clearCookie('refreshToken');
-      res.status(200).json({ id: req.userId as number });
+      res.status(200).json();
     } catch (err) {
       next(err);
     }
