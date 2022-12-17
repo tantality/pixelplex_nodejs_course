@@ -1,7 +1,7 @@
-import { NextFunction, Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { REFRESH_TOKEN_LIFETIME_IN_MS } from './auth.constants';
 import { AuthService } from './auth.service';
-import { SignUpResponse, LogInResponse, LogOutResponse, RefreshTokensResponse, SignUpRequest, LogInRequest } from './types';
+import { SignUpResponse, LogInResponse, RefreshTokensResponse, SignUpRequest, LogInRequest } from './types';
 
 export class AuthController {
   static signUp = async (req: SignUpRequest, res: SignUpResponse, next: NextFunction): Promise<void> => {
@@ -24,7 +24,7 @@ export class AuthController {
     }
   };
 
-  static logOut = async (req: Request, res: LogOutResponse, next: NextFunction): Promise<void> => {
+  static logOut = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await AuthService.logOut(req.userId as number);
 
