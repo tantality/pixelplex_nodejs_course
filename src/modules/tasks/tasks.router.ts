@@ -3,7 +3,7 @@ import { checkSchema } from 'express-validator';
 import { isAuth, validatePayload } from '../../middleware';
 import { TasksController } from './tasks.controller';
 import { TasksValidation } from './tasks.validation';
-import { GetTasksRequest, GetStatisticsRequest, CreateTaskRequest, AddAnswerToTaskRequest } from './types';
+import { GetTasksRequest, GetStatisticsRequest, CreateTaskRequest, UpdateTaskRequest } from './types';
 
 const router = Router();
 
@@ -25,8 +25,8 @@ router.post(
 router.post(
   '/:taskId/answer',
   checkSchema(TasksValidation.addAnswerToTask),
-  validatePayload<AddAnswerToTaskRequest>,
-  isAuth<AddAnswerToTaskRequest>,
+  validatePayload<UpdateTaskRequest>,
+  isAuth<UpdateTaskRequest>,
   TasksController.updateTask,
 );
 

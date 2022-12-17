@@ -1,5 +1,6 @@
 import { WordValueWithCardLanguages } from '../../cards/types';
 import { LanguageDTO } from '../../languages/language.dto';
+import { TaskDTO } from '../task.dto';
 
 export interface ITask {
   id: number;
@@ -29,6 +30,7 @@ export enum TASK_SORT_BY {
 }
 
 export type CreateTaskData = Pick<ITask, 'hiddenWordId' | 'userId' | 'type'>;
+export type CreatedTaskDTO = Pick<TaskDTO, 'id' | 'nativeLanguageId' | 'foreignLanguageId' | 'type'> & { word: string };
 export type TaskIdWithWordData = { id: number; hiddenWord: WordValueWithCardLanguages };
 export type GetStatisticsQueryResult = [{ language: LanguageDTO; answers: [{ count: number; status: string }] }];
 export type Answers = Record<TASK_STATUS, number>;

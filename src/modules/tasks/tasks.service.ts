@@ -9,15 +9,16 @@ import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
 import {
-  CreateTaskCommon,
   CreateTaskBody,
   TASK_TYPE,
-  AddAnswerToTaskBody,
+  UpdateTaskBody,
   TASK_STATUS,
   TaskIdWithWordData,
   GetTasksQuery,
   GetStatisticsQuery,
   Statistics,
+  CreatedTaskDTO,
+  UpdateTaskParams,
 } from './types';
 
 export class TasksService {
@@ -101,7 +102,7 @@ export class TasksService {
     return word;
   };
 
-  static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreateTaskCommon> => {
+  static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
       throw new NotFoundError('The user\'s native language is not set.');
@@ -154,7 +155,7 @@ export class TasksService {
     }
   };
 
-  static update = async (userId: number, taskId: number, { answer }: AddAnswerToTaskBody): Promise<TaskDTO> => {
+  static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {
     const task = await TasksService.findOneByCondition({ id: taskId, userId });
     if (!task) {
       throw new NotFoundError('Task not found');
