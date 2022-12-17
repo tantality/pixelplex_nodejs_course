@@ -13,7 +13,7 @@ export class WordsService {
     return preparedWords;
   };
 
-  private static getWordDTOs = (words: Word[]): WordDTO[] => {
+  private static getWordDTO = (words: Word[]): WordDTO[] => {
     return words.map((word) => new WordDTO(word));
   };
 
@@ -25,19 +25,19 @@ export class WordsService {
   static create = async (wordsData: CreateWordsData): Promise<WordDTO[]> => {
     const preparedWords: WordToCreate[] = WordsService.prepareWordsToCreate(wordsData);
     const createdWords = await WordsRepository.create(preparedWords);
-    const createdWordsDTOs = WordsService.getWordDTOs(createdWords);
+    const createdWordsDTO = WordsService.getWordDTO(createdWords);
 
-    return createdWordsDTOs;
+    return createdWordsDTO;
   };
 
   static updateLanguageId = async (cardId: number, oldLanguageId: number, newLanguageId: number): Promise<WordDTO[]> => {
     const updatedWords = await WordsRepository.updateLanguageId(cardId, oldLanguageId, newLanguageId);
-    return WordsService.getWordDTOs(updatedWords);
+    return WordsService.getWordDTO(updatedWords);
   };
 
   static update = async (cardLanguageId: number, wordsData: UpdateWordsData): Promise<WordDTO[]> => {
     let updatedWords = null;
-    let updatedWordsDTOs = null;
+    let updatedWordsDTO = null;
 
     if (!wordsData.values) {
       updatedWords = (await WordsService.findAllByCondition({
@@ -51,8 +51,8 @@ export class WordsService {
       updatedWords = await WordsRepository.update(cardLanguageId, preparedWords);
     }
 
-    updatedWordsDTOs = WordsService.getWordDTOs(updatedWords);
+    updatedWordsDTO = WordsService.getWordDTO(updatedWords);
 
-    return updatedWordsDTOs;
+    return updatedWordsDTO;
   };
 }

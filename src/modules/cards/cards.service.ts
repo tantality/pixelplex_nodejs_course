@@ -62,8 +62,8 @@ export class CardsService {
     cardId: number,
     { nativeWords, foreignLanguageId, foreignWords }: UpdateCardBody,
   ): Promise<CardDTO> => {
-    const updatableCard = await CardsService.findOneByCondition({ userId, id: cardId });
-    if (!updatableCard) {
+    const cardToUpdate = await CardsService.findOneByCondition({ userId, id: cardId });
+    if (!cardToUpdate) {
       throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
@@ -84,34 +84,33 @@ export class CardsService {
       throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
     }
 
-    let wordsWithUpdatedLanguageIdDTOs = null;
+    let updatedForeignWordsDTO = null;
     if (foreignLanguageId && !foreignWords) {
-      wordsWithUpdatedLanguageIdDTOs = await WordsService.updateLanguageId(cardId, updatableCard.foreignLanguageId, foreignLanguageId);
+      updatedForeignWordsDTO = await WordsService.updateLanguageId(cardId, cardToUpdate.foreignLanguageId, foreignLanguageId);
     }
 
-    const updatedNativeWordsDTOs = await WordsService.update(updatableCard.nativeLanguageId, {
-      cardId: updatableCard.id,
-      languageId: updatableCard.nativeLanguageId,
+    const updatedNativeWordsDTO = await WordsService.update(cardToUpdate.nativeLanguageId, {
+      cardId: cardToUpdate.id,
+      languageId: cardToUpdate.nativeLanguageId,
       values: nativeWords,
     });
 
-    let updatedForeignWordsDTOs = wordsWithUpdatedLanguageIdDTOs;
-    if (!updatedForeignWordsDTOs) {
-      updatedForeignWordsDTOs = await WordsService.update(updatableCard.foreignLanguageId, {
-        cardId: updatableCard.id,
-        languageId: foreignLanguageId ? foreignLanguageId : updatableCard.foreignLanguageId,
+    if (!updatedForeignWordsDTO) {
+      updatedForeignWordsDTO = await WordsService.update(cardToUpdate.foreignLanguageId, {
+        cardId: cardToUpdate.id,
+        languageId: foreignLanguageId ? foreignLanguageId : cardToUpdate.foreignLanguageId,
         values: foreignWords,
       });
     }
 
     const updatedCard = await CardsRepository.update(userId, cardId, foreignLanguageId);
 
-    return new CardDTO(updatedCard, updatedNativeWordsDTOs, updatedForeignWordsDTOs);
+    return new CardDTO(updatedCard, updatedNativeWordsDTO, updatedForeignWordsDTO);
   };
 
   static delete = async (userId: number, cardId: number): Promise<void> => {
-    const deletableCard = await CardsService.findOneByCondition({ userId, id: cardId });
-    if (!deletableCard) {
+    const cardToDelete = await CardsService.findOneByCondition({ userId, id: cardId });
+    if (!cardToDelete) {
       throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 

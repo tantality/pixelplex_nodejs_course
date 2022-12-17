@@ -5,7 +5,7 @@ import { Card } from './card.entity';
 import { CardToTransform, CARD_SORT_BY, GetCardsQuery } from './types';
 
 export class CardsRepository {
-  private static getCardsAndTheirCount = (queryResult: [{ cards: CardToTransform[]; count: string }]): { count: number; cards: CardDTO[] } => {
+  private static getCardsAndTheirNumber = (queryResult: [{ cards: CardToTransform[]; count: string }]): { count: number; cards: CardDTO[] } => {
     if (!queryResult.length) {
       return { count: 0, cards: [] };
     }
@@ -42,22 +42,22 @@ export class CardsRepository {
     return wordIds.map((id, ind) => ({ id, value: wordValues[ind] }));
   };
 
-  private static getQueryStringForWords = (userId: number, nameOfLanguageId: 'foreignLanguageId' | 'nativeLanguageId'): string => {
+  private static createSubqueryToFindWords = (userId: number, languageIdType: 'foreignLanguageId' | 'nativeLanguageId'): string => {
     return `
     (
       SELECT "w"."id" AS "id", "w"."value" AS "value", "w"."cardId" AS "cardId"
       FROM "cards" AS "c" LEFT JOIN "words" AS "w"
             ON "c"."id"="w"."cardId"
-      WHERE "c"."userId"=${userId} AND "c"."${nameOfLanguageId}" = "w"."languageId"
+      WHERE "c"."userId"=${userId} AND "c"."${languageIdType}" = "w"."languageId"
       GROUP BY  "w"."cardId", "w"."id"
     )`;
   };
 
-  private static groupWordsQueryString = (wordsQueryString: string, orderByWordQueryString: string): string => {
+  private static createSubqueryToGroupWords = (findWordsSubquery: string, orderByWordCondition: string): string => {
     return `
     (
-      SELECT ARRAY_AGG("w"."id" ${orderByWordQueryString}) AS "ids", ARRAY_AGG("w"."value" ${orderByWordQueryString}) AS "values", "w"."cardId" AS "cardId"
-      FROM ${wordsQueryString} AS "w"
+      SELECT ARRAY_AGG("w"."id" ${orderByWordCondition}) AS "ids", ARRAY_AGG("w"."value" ${orderByWordCondition}) AS "values", "w"."cardId" AS "cardId"
+      FROM ${findWordsSubquery} AS "w"
       GROUP BY "w"."cardId"
     )`;
   };
@@ -66,29 +66,29 @@ export class CardsRepository {
     userId: number,
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
   ): Promise<{ count: number; cards: CardDTO[] }> => {
-    let languageIdCondition = '';
+    let additionalLanguageIdCondition = '';
     if (typeof languageId === 'number') {
-      languageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
+      additionalLanguageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
     }
 
-    const orderByDateQueryString = sortBy === CARD_SORT_BY.DATE ? `ORDER BY "c"."createdAt" ${sortDirection}` : '';
-    const orderByWordQueryString = sortBy === CARD_SORT_BY.WORD ? `ORDER BY "w"."value" ${sortDirection} ` : '';
+    const orderByDateCondition = sortBy === CARD_SORT_BY.DATE ? `ORDER BY "c"."createdAt" ${sortDirection}` : '';
+    const orderByWordCondition = sortBy === CARD_SORT_BY.WORD ? `ORDER BY "w"."value" ${sortDirection} ` : '';
 
-    let searchInArrayQueryString = '';
+    let searchByWordCondition = '';
     if (search) {
-      searchInArrayQueryString = `
+      searchByWordCondition = `
         HAVING 
           ARRAY_TO_STRING("nativeWords"."values", ',') LIKE '%${search}%' 
           OR ARRAY_TO_STRING("foreignWords"."values", ',') LIKE '%${search}%'
       `;
     }
 
-    const nativeWordsQueryString = CardsRepository.getQueryStringForWords(userId, 'nativeLanguageId');
-    const groupedNativeWordsQueryString = CardsRepository.groupWordsQueryString(nativeWordsQueryString, orderByWordQueryString);
-    const foreignWordsQueryString = CardsRepository.getQueryStringForWords(userId, 'foreignLanguageId');
-    const groupedForeignWordsQueryString = CardsRepository.groupWordsQueryString(foreignWordsQueryString, orderByWordQueryString);
+    const findNativeWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'nativeLanguageId');
+    const groupNativeWordsSubquery = CardsRepository.createSubqueryToGroupWords(findNativeWordsSubquery, orderByWordCondition);
+    const findForeignWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'foreignLanguageId');
+    const groupForeignWordsSubquery = CardsRepository.createSubqueryToGroupWords(findForeignWordsSubquery, orderByWordCondition);
 
-    const cardsQueryString = `
+    const findAndCountCardsSubquery = `
     (
       SELECT
         "c"."id" AS "id", "c"."nativeLanguageId","c"."foreignLanguageId",
@@ -99,20 +99,20 @@ export class CardsRepository {
         "c"."createdAt" AS "createdAt",
         COUNT(*) OVER() AS "count"
       FROM
-        ${groupedNativeWordsQueryString} AS "nativeWords",
-        ${groupedForeignWordsQueryString}  AS "foreignWords",
+        ${groupNativeWordsSubquery} AS "nativeWords",
+        ${groupForeignWordsSubquery}  AS "foreignWords",
         "cards" AS "c" LEFT JOIN "words" AS "w" ON "c"."id"= "w"."cardId"
       WHERE
         "c"."userId"=${userId}
         AND "c"."nativeLanguageId" ="w"."languageId"
         AND "c"."id"="nativeWords"."cardId"
         AND "c"."id"="foreignWords"."cardId"
-        ${languageIdCondition}
+        ${additionalLanguageIdCondition}
       GROUP BY
         "c"."id","c"."nativeLanguageId","c"."foreignLanguageId",
         "c"."createdAt","nativeWords"."cardId","foreignWords"."cardId","nativeWords"."values", "foreignWords"."values", "nativeWords"."ids","foreignWords"."ids"
-        ${searchInArrayQueryString} 
-        ${orderByDateQueryString}
+      ${searchByWordCondition} 
+      ${orderByDateCondition}
       LIMIT ${limit} OFFSET ${offset}
     )`;
 
@@ -122,13 +122,13 @@ export class CardsRepository {
         'nativeWordIds', "cards"."nativeWordIds", 'nativeWordValues', "cards"."nativeWordValues", 'foreignWordIds', "cards"."foreignWordIds",
         'foreignWordValues', "cards"."foreignWordValues", 'createdAt', "cards"."createdAt")) AS "cards",
         "cards"."count" AS "count"
-      FROM ${cardsQueryString} AS "cards"
+      FROM ${findAndCountCardsSubquery} AS "cards"
       GROUP BY "cards"."count"
     `);
 
-    const { count, cards } = CardsRepository.getCardsAndTheirCount(cardsAndTheirNumberQueryResult);
+    const cardsAndTheirNumber = CardsRepository.getCardsAndTheirNumber(cardsAndTheirNumberQueryResult);
 
-    return { count, cards };
+    return cardsAndTheirNumber;
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[]): Promise<Card | null> => {

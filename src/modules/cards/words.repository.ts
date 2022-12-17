@@ -34,7 +34,9 @@ export class WordsRepository {
 
   static update = async (cardLanguageId: number, words: WordToCreate[]): Promise<Word[]> => {
     const cardId = words[0].cardId;
+
     await WordsRepository.deleteByCondition({ cardId, languageId: cardLanguageId });
+
     const updatedWords = await WordsRepository.create(words);
 
     return updatedWords;
