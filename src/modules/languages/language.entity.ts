@@ -1,7 +1,7 @@
 import { Entity, Column, Index, OneToMany, Relation } from 'typeorm';
-import { CommonEntity } from '../../entity';
+import { CommonEntity } from '../../entities';
 import { User } from '../users/user.entity';
-import { MAX_CODE_LENGTH, MAX_NAME_LENGTH } from './languages.constants';
+import { MAX_NAME_LENGTH, MAX_CODE_LENGTH } from './languages.constants';
 
 import { ILanguage } from './types';
 
