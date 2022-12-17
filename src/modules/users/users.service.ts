@@ -28,7 +28,7 @@ export class UsersService {
   };
 
   static update = async (userId: number, userData: UpdateUserData): Promise<User> => {
-    const updatableUser = await UsersService.findOneByCondition({ id: userId });
+    const userToUpdate = await UsersService.findOneByCondition({ id: userId });
 
     let nativeLanguage = null;
     if (userData as UpdateUserBody) {
@@ -38,7 +38,8 @@ export class UsersService {
       throw new NotFoundError('Language not found.');
     }
 
-    const updatedUser = await UsersRepository.update(updatableUser as User, userId, userData);
+    const updatedUser = await UsersRepository.update(userToUpdate as User, userId, userData);
+
     return updatedUser;
   };
 }
