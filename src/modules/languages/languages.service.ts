@@ -1,5 +1,5 @@
 import { FindOptionsWhere, ILike } from 'typeorm';
-import { BadRequestError, NotFoundError } from '../../errors';
+import { BadRequestError, LANGUAGE_ALREADY_EXISTS_MESSAGE, LANGUAGE_CANNOT_BE_DELETED_MESSAGE, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
 import { UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
@@ -40,7 +40,7 @@ export class LanguagesService {
   static create = async (body: CreateLanguageBody): Promise<LanguageDTO> => {
     const language = await LanguagesService.findOneByCondition({ code: body.code });
     if (language) {
-      throw new BadRequestError('The language with the specified code already exists.');
+      throw new BadRequestError(LANGUAGE_ALREADY_EXISTS_MESSAGE);
     }
 
     const createdLanguage = await LanguagesRepository.create(body);
@@ -51,13 +51,13 @@ export class LanguagesService {
   static update = async (languageId: number, body: UpdateLanguageBody): Promise<LanguageDTO> => {
     const languageToUpdate = await LanguagesService.findOneByCondition({ id: languageId });
     if (!languageToUpdate) {
-      throw new NotFoundError('Language not found.');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     const { code } = body;
     const language = code && (await LanguagesService.findOneByCondition({ code }));
     if (language) {
-      throw new BadRequestError('The language with the specified code already exists.');
+      throw new BadRequestError(LANGUAGE_ALREADY_EXISTS_MESSAGE);
     }
 
     const updatedLanguage = await LanguagesRepository.update(languageToUpdate, languageId, body);
@@ -68,12 +68,12 @@ export class LanguagesService {
   static delete = async (languageId: number): Promise<void> => {
     const languageToDelete = await LanguagesService.findOneByCondition({ id: languageId });
     if (!languageToDelete) {
-      throw new NotFoundError('Language not found.');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     const languageIsUsedInUsers = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
     if (languageIsUsedInUsers) {
-      throw new BadRequestError('The language cannot be deleted because it is set as the user\'s native language.');
+      throw new BadRequestError(LANGUAGE_CANNOT_BE_DELETED_MESSAGE);
     }
 
     await LanguagesRepository.delete(languageId);
