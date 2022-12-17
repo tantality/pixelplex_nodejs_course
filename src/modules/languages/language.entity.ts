@@ -1,7 +1,6 @@
-import { Entity, Column, Index, OneToMany, Relation } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 import { CommonEntity } from '../../entities';
-import { User } from '../users/user.entity';
-import { MAX_CODE_LENGTH, MAX_NAME_LENGTH } from './languages.constants';
+import { MAX_NAME_LENGTH, MAX_CODE_LENGTH } from './languages.constants';
 import { ILanguage } from './types';
 
 @Entity('languages')
@@ -12,7 +11,4 @@ export class Language extends CommonEntity implements ILanguage {
 
   @Column({ type: 'varchar', length: MAX_CODE_LENGTH, unique: true })
     code!: string;
-
-  @OneToMany(() => User, (user) => user.nativeLanguage)
-    users!: Relation<User>[];
 }
