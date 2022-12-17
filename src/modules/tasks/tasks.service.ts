@@ -19,6 +19,7 @@ import { TasksRepository } from './tasks.repository';
 import { Statistics, TASK_TYPE, CreatedTaskDTO, TASK_STATUS, UpdateTaskParams, TaskIdWithWordData } from './types';
 import { CreateTaskBody, UpdateTaskBody } from './types/body.types';
 import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
+import { getTaskStatus } from './utils';
 
 export class TasksService {
   static findAndCountAll = async (
@@ -145,15 +146,6 @@ export class TasksService {
     return answers;
   };
 
-  static getTaskStatus = (correctAnswers: string[], receivedAnswer: string): string => {
-    const isReceivedAnswerCorrect = correctAnswers.includes(receivedAnswer);
-    if (isReceivedAnswerCorrect) {
-      return TASK_STATUS.CORRECT;
-    } else {
-      return TASK_STATUS.INCORRECT;
-    }
-  };
-
   static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {
     const task = await TasksService.findOneByCondition({ id: taskId, userId });
     if (!task) {
@@ -167,7 +159,7 @@ export class TasksService {
     const { id, hiddenWordId, type } = task;
 
     const correctAnswers = await TasksService.findCorrectAnswers(hiddenWordId, userId, type);
-    const status = TasksService.getTaskStatus(correctAnswers, answer);
+    const status = getTaskStatus(correctAnswers, answer);
     const updatedTask = await TasksRepository.update(id, correctAnswers, answer, status);
 
     const {

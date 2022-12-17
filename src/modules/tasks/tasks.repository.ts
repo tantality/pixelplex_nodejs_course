@@ -41,9 +41,7 @@ export class TasksRepository {
       take,
     });
 
-    const tasksAndTheirNumber = getTasksAndTheirNumber(tasksAndTheirNumberQueryResult);
-
-    return tasksAndTheirNumber;
+    return getTasksAndTheirNumber(tasksAndTheirNumberQueryResult);
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Task>): Promise<Task | null> => {
@@ -52,7 +50,7 @@ export class TasksRepository {
   };
 
   static findOneForDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
-    const task = await Task.createQueryBuilder('task')
+    const task: TaskIdWithWordData | null = await Task.createQueryBuilder('task')
       .select(['task.id', 'card.nativeLanguageId', 'card.foreignLanguageId', 'word.value'])
       .leftJoin('task.hiddenWord', 'word')
       .leftJoin('word.card', 'card')
@@ -90,9 +88,7 @@ export class TasksRepository {
       GROUP BY "l"."id", "l"."code", "l"."name", "l"."createdAt"
   `);
 
-    const statistics = getStatisticsByLanguage(statisticsByLanguageQueryResult);
-
-    return statistics;
+    return getStatisticsByLanguage(statisticsByLanguageQueryResult);
   };
 
   static create = async (taskData: CreateTaskData): Promise<Task> => {
