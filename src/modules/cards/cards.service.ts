@@ -13,11 +13,11 @@ import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardsRepository } from './cards.repository';
-import { GetCardsCommon, CreateCardBody, UpdateCardBody, GetCardsQuery } from './types';
+import { CreateCardBody, UpdateCardBody, GetCardsQuery } from './types';
 import { WordsService } from './words.service';
 
 export class CardsService {
-  static findAndCountAll = async (userId: number, query: GetCardsQuery): Promise<GetCardsCommon> => {
+  static findAndCountAll = async (userId: number, query: GetCardsQuery): Promise<{ count: number; cards: CardDTO[] }> => {
     const cardsAndTheirNumber = await CardsRepository.findAndCountAll(userId, query);
     return cardsAndTheirNumber;
   };
