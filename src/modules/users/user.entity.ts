@@ -7,7 +7,7 @@ import { IUser, USER_ROLE } from './types';
 
 @Entity('users')
 export class User extends CommonEntity implements IUser {
-  @ManyToOne(() => Language, (language) => language.users)
+  @ManyToOne(() => Language)
   @JoinColumn({
     name: 'nativeLanguageId',
   })
