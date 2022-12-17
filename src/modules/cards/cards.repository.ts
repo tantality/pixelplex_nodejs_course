@@ -3,65 +3,9 @@ import AppDataSource from '../../data-source';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardToTransform, CARD_SORT_BY, GetCardsQuery } from './types';
+import { createSubqueryToFindWords, createSubqueryToGroupWords, getCardsAndTheirNumber } from './utils';
 
 export class CardsRepository {
-  private static getCardsAndTheirNumber = (queryResult: [{ cards: CardToTransform[]; count: string }]): { count: number; cards: CardDTO[] } => {
-    if (!queryResult.length) {
-      return { count: 0, cards: [] };
-    }
-
-    const [{ cards, count }] = queryResult;
-
-    const preparedCards = CardsRepository.transformCards(cards);
-
-    return { count: Number(count), cards: preparedCards };
-  };
-
-  private static transformCards = (cards: CardToTransform[]): CardDTO[] => {
-    const transformedCards: CardDTO[] = cards.map((card: CardToTransform) => {
-      const { id, nativeLanguageId, foreignLanguageId, nativeWordIds, nativeWordValues, foreignWordIds, foreignWordValues, createdAt } =
-        card;
-
-      const nativeWords = CardsRepository.getWords(nativeWordIds, nativeWordValues);
-      const foreignWords = CardsRepository.getWords(foreignWordIds, foreignWordValues);
-
-      return {
-        id,
-        nativeLanguageId,
-        foreignLanguageId,
-        nativeWords,
-        foreignWords,
-        createdAt,
-      } as CardDTO;
-    });
-
-    return transformedCards;
-  };
-
-  private static getWords = (wordIds: number[], wordValues: string[]): { id: number; value: string }[] => {
-    return wordIds.map((id, ind) => ({ id, value: wordValues[ind] }));
-  };
-
-  private static createSubqueryToFindWords = (userId: number, languageIdType: 'foreignLanguageId' | 'nativeLanguageId'): string => {
-    return `
-    (
-      SELECT "w"."id" AS "id", "w"."value" AS "value", "w"."cardId" AS "cardId"
-      FROM "cards" AS "c" LEFT JOIN "words" AS "w"
-            ON "c"."id"="w"."cardId"
-      WHERE "c"."userId"=${userId} AND "c"."${languageIdType}" = "w"."languageId"
-      GROUP BY  "w"."cardId", "w"."id"
-    )`;
-  };
-
-  private static createSubqueryToGroupWords = (findWordsSubquery: string, orderByWordCondition: string): string => {
-    return `
-    (
-      SELECT ARRAY_AGG("w"."id" ${orderByWordCondition}) AS "ids", ARRAY_AGG("w"."value" ${orderByWordCondition}) AS "values", "w"."cardId" AS "cardId"
-      FROM ${findWordsSubquery} AS "w"
-      GROUP BY "w"."cardId"
-    )`;
-  };
-
   static findAndCountAll = async (
     userId: number,
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
@@ -83,10 +27,10 @@ export class CardsRepository {
       `;
     }
 
-    const findNativeWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'nativeLanguageId');
-    const groupNativeWordsSubquery = CardsRepository.createSubqueryToGroupWords(findNativeWordsSubquery, orderByWordCondition);
-    const findForeignWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'foreignLanguageId');
-    const groupForeignWordsSubquery = CardsRepository.createSubqueryToGroupWords(findForeignWordsSubquery, orderByWordCondition);
+    const findNativeWordsSubquery = createSubqueryToFindWords(userId, 'nativeLanguageId');
+    const groupNativeWordsSubquery = createSubqueryToGroupWords(findNativeWordsSubquery, orderByWordCondition);
+    const findForeignWordsSubquery = createSubqueryToFindWords(userId, 'foreignLanguageId');
+    const groupForeignWordsSubquery = createSubqueryToGroupWords(findForeignWordsSubquery, orderByWordCondition);
 
     const findAndCountCardsSubquery = `
     (
@@ -126,9 +70,7 @@ export class CardsRepository {
       GROUP BY "cards"."count"
     `);
 
-    const cardsAndTheirNumber = CardsRepository.getCardsAndTheirNumber(cardsAndTheirNumberQueryResult);
-
-    return cardsAndTheirNumber;
+    return getCardsAndTheirNumber(cardsAndTheirNumberQueryResult);
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[]): Promise<Card | null> => {

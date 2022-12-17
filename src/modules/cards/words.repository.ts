@@ -37,9 +37,9 @@ export class WordsRepository {
 
     await WordsRepository.deleteByCondition({ cardId, languageId: cardLanguageId });
 
-    const updatedWords = await WordsRepository.create(words);
+    const createdWords = await WordsRepository.create(words);
 
-    return updatedWords;
+    return createdWords;
   };
 
   static deleteByCondition = async (whereCondition: FindOptionsWhere<Word>): Promise<void> => {
