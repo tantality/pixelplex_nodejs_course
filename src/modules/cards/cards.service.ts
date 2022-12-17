@@ -114,14 +114,12 @@ export class CardsService {
     return new CardDTO(updatedCard, updatedNativeWordsDTOs, updatedForeignWordsDTOs);
   };
 
-  static delete = async (userId: number, cardId: number): Promise<number> => {
+  static delete = async (userId: number, cardId: number): Promise<void> => {
     const deletableCard = await CardsService.findOneByCondition({ userId, id: cardId });
     if (!deletableCard) {
       throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
     await CardsRepository.delete(cardId);
-
-    return cardId;
   };
 }
