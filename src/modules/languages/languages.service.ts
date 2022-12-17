@@ -49,25 +49,25 @@ export class LanguagesService {
   };
 
   static update = async (languageId: number, body: UpdateLanguageBody): Promise<LanguageDTO> => {
-    const updatableLanguage = await LanguagesService.findOneByCondition({ id: languageId });
-    if (!updatableLanguage) {
+    const languageToUpdate = await LanguagesService.findOneByCondition({ id: languageId });
+    if (!languageToUpdate) {
       throw new NotFoundError('Language not found.');
     }
 
     const { code } = body;
-    const languageWithCurrentCode = code && (await LanguagesService.findOneByCondition({ code }));
-    if (languageWithCurrentCode) {
+    const language = code && (await LanguagesService.findOneByCondition({ code }));
+    if (language) {
       throw new BadRequestError('The language with the specified code already exists.');
     }
 
-    const updatedLanguage = await LanguagesRepository.update(updatableLanguage, languageId, body);
+    const updatedLanguage = await LanguagesRepository.update(languageToUpdate, languageId, body);
 
     return new LanguageDTO(updatedLanguage);
   };
 
   static delete = async (languageId: number): Promise<void> => {
-    const deletableLanguage = await LanguagesService.findOneByCondition({ id: languageId });
-    if (!deletableLanguage) {
+    const languageToDelete = await LanguagesService.findOneByCondition({ id: languageId });
+    if (!languageToDelete) {
       throw new NotFoundError('Language not found.');
     }
 
