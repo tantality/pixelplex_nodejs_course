@@ -1,5 +1,5 @@
 import { NextFunction, Request } from 'express';
-import { NotFoundError } from '../../errors';
+import { NotFoundError, USER_NOT_FOUND_MESSAGE } from '../../errors';
 import { GetOneUserResponse, UpdateUserRequest, UpdateUserResponse } from './types';
 import { UserDTO } from './user.dto';
 import { UsersService } from './users.service';
@@ -9,7 +9,7 @@ export class UsersController {
     try {
       const user = await UsersService.findOneByCondition({ id: 2 });
       if (!user) {
-        throw new NotFoundError('User not found.');
+        throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
       }
 
       res.status(200).json(new UserDTO(user));
