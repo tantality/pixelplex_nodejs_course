@@ -1,5 +1,5 @@
 import { FindOptionsWhere } from 'typeorm';
-import { BadRequestError, NotFoundError } from '../../errors';
+import { BadRequestError, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError, USER_ALREADY_EXISTS_MESSAGE } from '../../errors';
 import { LanguagesService } from '../languages/languages.service';
 import { CreateUserData, UpdateUserBody, UpdateUserData } from './types';
 import { User } from './user.entity';
@@ -14,12 +14,12 @@ export class UsersService {
   static create = async (userData: CreateUserData): Promise<User> => {
     const nativeLanguage = await LanguagesService.findOneByCondition({ id: userData.nativeLanguageId });
     if (!nativeLanguage) {
-      throw new NotFoundError('Language not found.');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     const user = await UsersService.findOneByCondition({ normalizedEmail: userData.normalizedEmail });
     if (user) {
-      throw new BadRequestError('The user with the specified email already exists.');
+      throw new BadRequestError(USER_ALREADY_EXISTS_MESSAGE);
     }
 
     const createdUser = await UsersRepository.create(userData);
@@ -35,7 +35,7 @@ export class UsersService {
       nativeLanguage = await LanguagesService.findOneByCondition({ id: (userData as UpdateUserBody).nativeLanguageId });
     }
     if (!nativeLanguage) {
-      throw new NotFoundError('Language not found.');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     const updatedUser = await UsersRepository.update(userToUpdate as User, userId, userData);

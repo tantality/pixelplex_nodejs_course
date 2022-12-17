@@ -1,5 +1,12 @@
 import { FindOptionsWhere } from 'typeorm';
-import { BadRequestError, NotFoundError } from '../../errors';
+import {
+  BadRequestError,
+  CARD_NOT_FOUND_MESSAGE,
+  LANGUAGE_NOT_FOUND_MESSAGE,
+  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
+  NotFoundError,
+  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
+} from '../../errors';
 import { LanguagesService } from '../languages/languages.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -30,15 +37,15 @@ export class CardsService {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
     if (!foreignLanguage) {
-      throw new NotFoundError('Language not found');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     if (!nativeLanguageId) {
-      throw new NotFoundError('The user\'s native language is not set.');
+      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError('ForeignLanguageId must be different from the user\'s nativeLanguageId.');
+      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
     }
 
     const createdCard = await CardsRepository.create(userId, nativeLanguageId, foreignLanguageId);
@@ -63,24 +70,24 @@ export class CardsService {
   ): Promise<CardDTO> => {
     const updatableCard = await CardsService.findOneByCondition({ userId, id: cardId });
     if (!updatableCard) {
-      throw new NotFoundError('Card not found');
+      throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
     let foreignLanguage = null;
     if (foreignLanguageId) {
       foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
       if (!foreignLanguage) {
-        throw new NotFoundError('Language not found');
+        throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
       }
     }
 
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
-      throw new NotFoundError('The user\'s native language is not set.');
+      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError('ForeignLanguageId must be different from the user\'s nativeLanguageId.');
+      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
     }
 
     let wordsWithUpdatedLanguageIdDTOs = null;
@@ -111,7 +118,7 @@ export class CardsService {
   static delete = async (userId: number, cardId: number): Promise<number> => {
     const deletableCard = await CardsService.findOneByCondition({ userId, id: cardId });
     if (!deletableCard) {
-      throw new NotFoundError('Card not found.');
+      throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
     await CardsRepository.delete(cardId);
