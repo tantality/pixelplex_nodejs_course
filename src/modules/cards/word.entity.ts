@@ -1,25 +1,12 @@
-import {
-  Entity,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Relation,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
 import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
 import { Language } from '../languages/language.entity';
 import { Card } from './card.entity';
 import { IWord } from './types';
 
 @Entity('words')
-export class Word extends BaseEntity implements IWord {
-  @PrimaryGeneratedColumn()
-    id!: number;
-
+export class Word extends CommonEntity implements IWord {
   @ManyToOne(() => Card, {
     onDelete: 'CASCADE',
   })
@@ -43,10 +30,4 @@ export class Word extends BaseEntity implements IWord {
 
   @Column({ type: 'varchar', length: MAX_STRING_LENGTH })
     value!: string;
-
-  @CreateDateColumn()
-    createdAt!: Date;
-
-  @UpdateDateColumn()
-    updatedAt!: Date;
 }
