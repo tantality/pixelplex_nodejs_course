@@ -25,9 +25,11 @@ export class Word extends CommonEntity implements IWord {
   })
     language!: Relation<Language>;
 
+  @Index()
   @Column()
     languageId!: number;
 
+  @Index()
   @Column({ type: 'varchar', length: MAX_STRING_LENGTH })
     value!: string;
 }
