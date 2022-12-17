@@ -131,19 +131,8 @@ export class CardsRepository {
     return { count, cards };
   };
 
-  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card>): Promise<Card | null> => {
-    const card = await Card.findOneBy(whereCondition);
-    return card;
-  };
-
-  static findOneWithLanguage = async (languageId: number): Promise<Card | null> => {
-    const card = await AppDataSource.createQueryBuilder()
-      .select('card')
-      .from(Card, 'card')
-      .where('card.nativeLanguageId = :nativeLanguageId', { nativeLanguageId: languageId })
-      .orWhere('card.foreignLanguageId = :foreignLanguageId', { foreignLanguageId: languageId })
-      .getOne();
-
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[]): Promise<Card | null> => {
+    const card = await Card.findOne({ where: whereCondition });
     return card;
   };
 

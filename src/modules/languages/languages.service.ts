@@ -73,7 +73,11 @@ export class LanguagesService {
     }
 
     const languageIsUsedInUsers = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
-    const languageIsUsedInCards = await CardsService.findOneWithLanguage(languageId);
+    const languageIsUsedInCards = await CardsService.findOneByCondition([
+      { nativeLanguageId: languageId },
+      { foreignLanguageId: languageId },
+    ]);
+
     if (languageIsUsedInUsers || languageIsUsedInCards) {
       throw new BadRequestError(LANGUAGE_CANNOT_BE_DELETED_MESSAGE);
     }
