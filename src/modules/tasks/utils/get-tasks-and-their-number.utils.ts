@@ -39,7 +39,7 @@ const changeTasksStructure = (tasks: Task[]): TaskDTO[] => {
   return changedTasks;
 };
 
-export const getTasksAndTheirNumber = ([tasks, count]: [tasks: Task[], count: number]): { count:number; tasks:TaskDTO[] } => {
+export const getTasksAndTheirNumber = ([tasks, count]: [tasks: Task[], count: number]): { count: number; tasks: TaskDTO[] } => {
   if (!tasks.length) {
     return { count, tasks: [] };
   }

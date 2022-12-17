@@ -1,11 +1,7 @@
-/* eslint-disable require-await */
 import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../errors';
-import { logRequest } from '../../utils';
 import { Word } from '../cards/word.entity';
 import { WordsService } from '../cards/words.service';
-import { LanguageDTO } from '../languages/language.dto';
-import { Language } from '../languages/language.entity';
 import { LanguagesService } from '../languages/languages.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -13,8 +9,6 @@ import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
 import {
-  GetStatisticsCommon,
-  GetStatisticsRequest,
   CreateTaskCommon,
   CreateTaskBody,
   TASK_TYPE,
@@ -22,15 +16,9 @@ import {
   TASK_STATUS,
   TaskIdWithWordData,
   GetTasksQuery,
+  GetStatisticsQuery,
+  Statistics,
 } from './types';
-
-const language = new Language();
-language.id = 1;
-language.code = 'russian';
-language.name = 'ru';
-language.createdAt = new Date();
-language.updatedAt = new Date();
-const languageDTO = new LanguageDTO(language);
 
 export class TasksService {
   static findAndCountAll = async (
@@ -89,18 +77,8 @@ export class TasksService {
     return task;
   };
 
-  static calculateStatistics = async (req: GetStatisticsRequest): Promise<GetStatisticsCommon | null> => {
-    logRequest(req);
-    const statistics = [
-      {
-        language: languageDTO,
-        answers: {
-          correct: 10,
-          incorrect: 1,
-        },
-      },
-    ];
-
+  static calculateStatistics = async (userId: number, query: GetStatisticsQuery): Promise<{ statistics: Statistics[] }> => {
+    const statistics = await TasksRepository.calculateStatistics(userId, query);
     return statistics;
   };
 

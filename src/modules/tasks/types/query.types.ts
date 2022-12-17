@@ -8,4 +8,4 @@ export type GetTasksQuery = {
   taskStatus?: string;
 };
 
-export type GetStatisticsQuery = { fromDate?: Date; toDate?: Date; languagesIds?: number[] };
+export type GetStatisticsQuery = { fromDate?: Date; toDate?: Date; languageIds?: number[] };

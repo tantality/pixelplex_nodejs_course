@@ -1,8 +1,9 @@
 import { DeepPartial, FindOptionsOrderValue, FindOptionsWhere } from 'typeorm';
+import AppDataSource from '../../data-source';
 import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
-import { CreateTaskData, TaskIdWithWordData } from './types';
-import { getTasksAndTheirNumber } from './utils';
+import { CreateTaskData, GetStatisticsQuery, GetStatisticsQueryResult, Statistics, TaskIdWithWordData } from './types';
+import { getStatisticsByLanguage, getTasksAndTheirNumber } from './utils';
 
 export class TasksRepository {
   static findAndCountAll = async (
@@ -40,7 +41,9 @@ export class TasksRepository {
       take,
     });
 
-    return getTasksAndTheirNumber(tasksAndTheirNumberQueryResult);
+    const tasksAndTheirNumber = getTasksAndTheirNumber(tasksAndTheirNumberQueryResult);
+
+    return tasksAndTheirNumber;
   };
 
   static findOneByCondition = async (whereCondition: FindOptionsWhere<Task>): Promise<Task | null> => {
@@ -57,6 +60,39 @@ export class TasksRepository {
       .getOne();
 
     return task;
+  };
+
+  static calculateStatistics = async (
+    userId: number,
+    { fromDate, toDate, languageIds }: GetStatisticsQuery,
+  ): Promise<{ statistics: Statistics[] }> => {
+    const additionalLanguageIdCondition = languageIds ? ` and "w"."languageId" in (${languageIds.join(',')})` : '';
+
+    let additionalDatesCondition = ' and "t"."createdAt" BETWEEN ';
+    const fromDateString = fromDate ? `'${fromDate.toISOString()}' and ` : 'LEAST("t"."createdAt") and ';
+    const toDateString = toDate ? `'${toDate.toISOString()}'` : 'GREATEST("t"."createdAt")';
+    additionalDatesCondition += fromDateString + toDateString;
+
+    const statisticsByLanguageQueryResult: GetStatisticsQueryResult = await AppDataSource.query(`
+      SELECT 
+        JSONB_BUILD_OBJECT('id', "l"."id", 'code', "l"."code", 'name', "l"."name", 'createdAt', "l"."createdAt") AS "language",
+        JSONB_AGG( DISTINCT "stats"."answers" ) AS "answers"
+      FROM (
+          SELECT "w"."languageId" AS "languageId", JSONB_BUILD_OBJECT('count', COUNT(*), 'status', "t"."status" )  AS "answers"
+          FROM "tasks" AS "t" LEFT JOIN "words" AS "w" ON "t"."hiddenWordId" = "w"."id" 
+          WHERE "t"."userId"=${userId} ${additionalLanguageIdCondition} ${additionalDatesCondition}
+          GROUP BY "w"."languageId" , "t"."status"
+        ) AS "stats",
+        "tasks" AS "t" 
+          LEFT JOIN "words" AS "w" ON "t"."hiddenWordId" = "w"."id"
+          LEFT JOIN "languages" AS "l" ON "w"."languageId" = "l"."id"
+      WHERE "w"."languageId" = "stats"."languageId" 
+      GROUP BY "l"."id", "l"."code", "l"."name", "l"."createdAt"
+  `);
+
+    const statistics = getStatisticsByLanguage(statisticsByLanguageQueryResult);
+
+    return statistics;
   };
 
   static create = async (taskData: CreateTaskData): Promise<Task> => {
