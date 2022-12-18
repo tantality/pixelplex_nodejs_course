@@ -19,7 +19,6 @@ import { WordsService } from './words.service';
 export class CardsService {
   static findAndCountAll = async (userId: number, query: GetCardsQuery): Promise<GetCardsCommon> => {
     const cardsAndTheirNumber = await CardsRepository.findAndCountAll(userId, query);
-
     return cardsAndTheirNumber;
   };
 
@@ -35,13 +34,13 @@ export class CardsService {
 
   static create = async (userId: number, { nativeWords, foreignLanguageId, foreignWords }: CreateCardBody): Promise<CardDTO> => {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
+    if (!nativeLanguageId) {
+      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
+    }
+
     const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
     if (!foreignLanguage) {
       throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-    }
-
-    if (!nativeLanguageId) {
-      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     if (foreignLanguageId === nativeLanguageId) {
@@ -83,7 +82,7 @@ export class CardsService {
 
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
-      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
+      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     if (foreignLanguageId === nativeLanguageId) {

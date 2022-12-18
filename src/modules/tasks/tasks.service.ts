@@ -104,7 +104,7 @@ export class TasksService {
   static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
-      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
+      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
