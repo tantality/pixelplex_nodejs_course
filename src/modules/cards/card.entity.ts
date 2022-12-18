@@ -1,25 +1,13 @@
-import {
-  Entity,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Relation,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
 import { Language } from '../languages/language.entity';
 import { User } from '../users/user.entity';
 import { ICard } from './types';
 
+@Index(['createdAt'])
 @Index(['nativeLanguageId', 'foreignLanguageId'])
 @Entity('cards')
-export class Card extends BaseEntity implements ICard {
-  @PrimaryGeneratedColumn()
-    id!: number;
-
+export class Card extends CommonEntity implements ICard {
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
@@ -49,11 +37,4 @@ export class Card extends BaseEntity implements ICard {
 
   @Column()
     foreignLanguageId!: number;
-
-  @Index()
-  @CreateDateColumn()
-    createdAt!: Date;
-
-  @UpdateDateColumn()
-    updatedAt!: Date;
 }

@@ -1,25 +1,13 @@
-import {
-  Entity,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Relation,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
 import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
 import { Word } from '../cards/word.entity';
 import { User } from '../users/user.entity';
 import { ITask, TASK_STATUS, TASK_TYPE } from './types';
 
+@Index(['createdAt'])
 @Entity('tasks')
-export class Task extends BaseEntity implements ITask {
-  @PrimaryGeneratedColumn()
-    id!: number;
-
+export class Task extends CommonEntity implements ITask {
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
@@ -55,11 +43,4 @@ export class Task extends BaseEntity implements ITask {
 
   @Column({ type: 'varchar', length: MAX_STRING_LENGTH, nullable: true })
     receivedAnswer!: string;
-
-  @Index()
-  @CreateDateColumn()
-    createdAt!: Date;
-
-  @UpdateDateColumn()
-    updatedAt!: Date;
 }
