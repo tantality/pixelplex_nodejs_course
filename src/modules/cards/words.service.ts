@@ -26,18 +26,8 @@ export class WordsService {
     return word;
   };
 
-  static findCardIdsByConditionQueryBuilder = (
-    userId: number,
-    nativeLanguageId: number,
-    foreignLanguageId: number,
-    value: string,
-  ): SelectQueryBuilder<Word> => {
-    const queryBuilder = WordsRepository.findCardIdsByConditionQueryBuilder(userId, nativeLanguageId, foreignLanguageId, value);
-    return queryBuilder;
-  };
-
-  static findCorrectAnswersToTask = async (cardIdsQueryBuilder: SelectQueryBuilder<Word>, languageId: number): Promise<string[]> => {
-    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(cardIdsQueryBuilder, languageId);
+  static findCorrectAnswersToTask = async (findCardIdsQueryBuilder: SelectQueryBuilder<Word>, languageId: number): Promise<string[]> => {
+    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(findCardIdsQueryBuilder, languageId);
     if (!answers) {
       return [];
     }

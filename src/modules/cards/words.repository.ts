@@ -35,28 +35,13 @@ export class WordsRepository {
     return word;
   };
 
-  static findCardIdsByConditionQueryBuilder = (
-    userId: number,
-    nativeLanguageId: number,
-    foreignLanguageId: number,
-    value: string,
-  ): SelectQueryBuilder<Word> => {
-    return Word.createQueryBuilder('word')
-      .select('word.cardId')
-      .leftJoin('word.card', 'card')
-      .where(`card.userId = ${userId}`)
-      .andWhere(`card.nativeLanguageId = ${nativeLanguageId}`)
-      .andWhere(`card.foreignLanguageId = ${foreignLanguageId}`)
-      .andWhere(`word.value = '${value}'`);
-  };
-
   static findCorrectAnswersToTask = async (
-    cardIdsQueryBuilder: SelectQueryBuilder<Word>,
+    findCardIdsQueryBuilder: SelectQueryBuilder<Word>,
     languageId: number,
   ): Promise<FindAnswersQueryResult> => {
     const answers = await Word.createQueryBuilder('word')
-      .select('array_agg(DISTINCT "word"."value") as "answers"')
-      .where(`word.cardId IN ( ${cardIdsQueryBuilder.getQuery()} )`)
+      .select('ARRAY_AGG(DISTINCT "word"."value") AS "answers"')
+      .where(`word.cardId IN ( ${findCardIdsQueryBuilder.getQuery()} )`)
       .andWhere('word.languageId = :languageId', { languageId })
       .getRawOne();
 
