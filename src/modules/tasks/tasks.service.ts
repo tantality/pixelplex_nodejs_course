@@ -149,7 +149,7 @@ export class TasksService {
         value,
         card: { nativeLanguageId, foreignLanguageId },
       },
-    } = (await TasksRepository.findOneForDTO(id)) as TaskIdWithWordData;
+    } = (await TasksRepository.findTaskPartForDTO(id)) as TaskIdWithWordData;
 
     return new TaskDTO(updatedTask, value, nativeLanguageId, foreignLanguageId);
   };

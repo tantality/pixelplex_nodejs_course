@@ -49,7 +49,7 @@ export class TasksRepository {
     return task;
   };
 
-  static findOneForDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
+  static findTaskPartForDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
     const task: TaskIdWithWordData | null = await Task.createQueryBuilder('task')
       .select(['task.id', 'card.nativeLanguageId', 'card.foreignLanguageId', 'word.value'])
       .leftJoin('task.hiddenWord', 'word')
@@ -64,12 +64,12 @@ export class TasksRepository {
     userId: number,
     { fromDate, toDate, languageIds }: GetStatisticsQuery,
   ): Promise<{ statistics: Statistics[] }> => {
-    const additionalLanguageIdCondition = languageIds ? ` and "w"."languageId" in (${languageIds.join(',')})` : '';
+    const additionalLanguageIdCondition = languageIds ? ` AND "w"."languageId" IN (${languageIds.join(',')})` : '';
 
-    let additionalDatesCondition = ' and "t"."createdAt" BETWEEN ';
-    const fromDateString = fromDate ? `'${fromDate.toISOString()}' and ` : 'LEAST("t"."createdAt") and ';
-    const toDateString = toDate ? `'${toDate.toISOString()}'` : 'GREATEST("t"."createdAt")';
-    additionalDatesCondition += fromDateString + toDateString;
+    let additionalDatesCondition = ' AND "t"."createdAt" BETWEEN ';
+    const fromDateQueryString = fromDate ? `'${fromDate.toISOString()}' AND ` : 'LEAST("t"."createdAt") AND ';
+    const toDateQueryString = toDate ? `'${toDate.toISOString()}'` : 'GREATEST("t"."createdAt")';
+    additionalDatesCondition += fromDateQueryString + toDateQueryString;
 
     const statisticsByLanguageQueryResult: GetStatisticsQueryResult = await AppDataSource.query(`
       SELECT 
