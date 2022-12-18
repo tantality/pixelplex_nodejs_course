@@ -17,6 +17,24 @@ export class WordsRepository {
     return word;
   };
 
+  static findRandomOne = async (
+    userId: number,
+    cardNativeLanguageId: number,
+    cardForeignLanguageId: number,
+    wordLanguageId: number,
+  ): Promise<Word | null> => {
+    const word = await Word.createQueryBuilder('word')
+      .leftJoinAndSelect('word.card', 'card')
+      .where('card.userId=:userId', { userId })
+      .andWhere('card.nativeLanguageId=:nativeLanguageId', { cardNativeLanguageId })
+      .andWhere('card.foreignLanguageId=:foreignLanguageId', { cardForeignLanguageId })
+      .andWhere('word.languageId=:languageId', { wordLanguageId })
+      .orderBy('RANDOM()')
+      .getOne();
+
+    return word;
+  };
+
   static findCardIdsByConditionQueryBuilder = (
     userId: number,
     nativeLanguageId: number,

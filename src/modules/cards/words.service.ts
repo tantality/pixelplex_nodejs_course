@@ -16,6 +16,16 @@ export class WordsService {
     return word;
   };
 
+  static findRandomOne = async (
+    userId: number,
+    cardNativeLanguageId: number,
+    cardForeignLanguageId: number,
+    wordLanguageId: number,
+  ): Promise<Word | null> => {
+    const word = await WordsRepository.findRandomOne(userId, cardNativeLanguageId, cardForeignLanguageId, wordLanguageId);
+    return word;
+  };
+
   static findCardIdsByConditionQueryBuilder = (
     userId: number,
     nativeLanguageId: number,

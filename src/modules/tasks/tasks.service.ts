@@ -83,25 +83,6 @@ export class TasksService {
     return statistics;
   };
 
-  static getRandomWord = async (
-    userId: number,
-    nativeLanguageId: number,
-    foreignLanguageId: number,
-    type: string,
-  ): Promise<Word | null> => {
-    const languageId = type === TASK_TYPE.TO_NATIVE ? foreignLanguageId : nativeLanguageId;
-    const word = await Word.createQueryBuilder('word')
-      .leftJoinAndSelect('word.card', 'card')
-      .where('card.userId=:userId', { userId })
-      .andWhere('card.nativeLanguageId=:nativeLanguageId', { nativeLanguageId })
-      .andWhere('card.foreignLanguageId=:foreignLanguageId', { foreignLanguageId })
-      .andWhere('word.languageId=:languageId', { languageId })
-      .orderBy('RANDOM()')
-      .getOne();
-
-    return word;
-  };
-
   static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
@@ -117,7 +98,8 @@ export class TasksService {
       throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
     }
 
-    const hiddenWord = await TasksService.getRandomWord(userId, nativeLanguageId, foreignLanguageId, type);
+    const wordLanguageId = type === TASK_TYPE.TO_NATIVE ? foreignLanguageId : nativeLanguageId;
+    const hiddenWord = await WordsService.findRandomOne(userId, nativeLanguageId, foreignLanguageId, wordLanguageId);
     if (!hiddenWord) {
       throw new BadRequestError(NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE);
     }
