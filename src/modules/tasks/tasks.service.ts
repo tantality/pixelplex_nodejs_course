@@ -1,4 +1,4 @@
-import { FindOptionsWhere, ILike } from 'typeorm';
+import { FindOptionsWhere, Like } from 'typeorm';
 import {
   ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE,
   LANGUAGE_NOT_FOUND_MESSAGE,
@@ -33,7 +33,7 @@ export class TasksService {
       baseCondition = {
         ...baseCondition,
         hiddenWord: {
-          value: ILike(`%${search}%`),
+          value: Like(`%${search}%`),
         },
       };
     }
