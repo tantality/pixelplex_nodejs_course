@@ -1,3 +1,5 @@
+import { ADMIN_ACTION_MESSAGE } from './error-messages.constants';
+
 export class AppError extends Error {
   constructor(message: string, public readonly statusCode: number) {
     super(message);
@@ -21,7 +23,7 @@ export class UnauthorizedError extends AppError {
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'This action is available only to the administrator.') {
+  constructor(message: string = ADMIN_ACTION_MESSAGE) {
     super(message, 403);
   }
 }

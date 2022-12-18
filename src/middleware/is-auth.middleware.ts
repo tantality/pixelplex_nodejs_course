@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { UnauthorizedError } from '../errors';
+import { ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE, AUTHORIZATION_HEADER_IS_MISSING_MESSAGE, UnauthorizedError } from '../errors';
 import { JWTService } from '../modules/auth/jwt.service';
 
 export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
@@ -7,7 +7,7 @@ export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
     const request = req as T & Request;
     const authHeader = request.get('Authorization');
     if (!authHeader) {
-      throw new UnauthorizedError('Authorization header is missing.');
+      throw new UnauthorizedError(AUTHORIZATION_HEADER_IS_MISSING_MESSAGE);
     }
 
     const accessToken = authHeader.split(' ')[1];
@@ -18,6 +18,6 @@ export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
 
     next();
   } catch (err) {
-    next(new UnauthorizedError('Access token is missing or invalid.'));
+    next(new UnauthorizedError(ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE));
   }
 }

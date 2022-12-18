@@ -1,5 +1,13 @@
 import { FindOptionsWhere, ILike } from 'typeorm';
-import { BadRequestError, NotFoundError } from '../../errors';
+import {
+  ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE,
+  LANGUAGE_NOT_FOUND_MESSAGE,
+  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
+  NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE,
+  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
+  TASK_NOT_FOUND_MESSAGE,
+} from '../../errors';
+import { BadRequestError, NotFoundError } from '../../errors/app.error';
 import { Word } from '../cards/word.entity';
 import { WordsService } from '../cards/words.service';
 import { LanguagesService } from '../languages/languages.service';
@@ -8,18 +16,9 @@ import { UsersService } from '../users/users.service';
 import { TaskDTO } from './task.dto';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
-import {
-  CreateTaskBody,
-  TASK_TYPE,
-  UpdateTaskBody,
-  TASK_STATUS,
-  TaskIdWithWordData,
-  GetTasksQuery,
-  GetStatisticsQuery,
-  Statistics,
-  CreatedTaskDTO,
-  UpdateTaskParams,
-} from './types';
+import { Statistics, TASK_TYPE, CreatedTaskDTO, TASK_STATUS, UpdateTaskParams, TaskIdWithWordData } from './types';
+import { CreateTaskBody, UpdateTaskBody } from './types/body.types';
+import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
 
 export class TasksService {
   static findAndCountAll = async (
@@ -105,21 +104,21 @@ export class TasksService {
   static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
     if (!nativeLanguageId) {
-      throw new NotFoundError('The user\'s native language is not set.');
+      throw new NotFoundError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
     }
 
     const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
     if (!foreignLanguage) {
-      throw new NotFoundError('Language not found');
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
     if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError('ForeignLanguageId must be different from the user\'s nativeLanguageId.');
+      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
     }
 
     const hiddenWord = await TasksService.getRandomWord(userId, nativeLanguageId, foreignLanguageId, type);
     if (!hiddenWord) {
-      throw new BadRequestError('No cards with the current native or / and foreign language were found.');
+      throw new BadRequestError(NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE);
     }
 
     const createdTask = await TasksRepository.create({ userId, hiddenWordId: hiddenWord.id, type });
@@ -158,11 +157,11 @@ export class TasksService {
   static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {
     const task = await TasksService.findOneByCondition({ id: taskId, userId });
     if (!task) {
-      throw new NotFoundError('Task not found');
+      throw new NotFoundError(TASK_NOT_FOUND_MESSAGE);
     }
 
     if (task.status !== TASK_STATUS.UNANSWERED) {
-      throw new BadRequestError('The answer has already been recorded for the task');
+      throw new BadRequestError(ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE);
     }
 
     const { id, hiddenWordId, type } = task;
