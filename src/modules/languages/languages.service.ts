@@ -1,4 +1,4 @@
-import { FindOptionsWhere, ILike } from 'typeorm';
+import { FindOptionsWhere, Like } from 'typeorm';
 import { BadRequestError, LANGUAGE_ALREADY_EXISTS_MESSAGE, LANGUAGE_CANNOT_BE_DELETED_MESSAGE, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
 import { CardsService } from '../cards/cards.service';
@@ -19,7 +19,7 @@ export class LanguagesService {
     let whereCondition: FindOptionsWhere<Language> = {};
     if (search) {
       whereCondition = {
-        name: ILike(`%${search}%`),
+        name: Like(`%${search}%`),
       };
     }
 
