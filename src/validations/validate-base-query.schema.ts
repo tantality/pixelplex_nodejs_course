@@ -10,6 +10,7 @@ export const validateBaseQuery: Schema = {
     optional: true,
     ...validateAndSanitizeString,
     ...DEFAULT_STRING_LENGTH_VALIDATION,
+    toLowerCase: true,
   },
   offset: {
     in: ['query'],
