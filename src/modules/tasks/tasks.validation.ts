@@ -116,6 +116,7 @@ export class TasksValidation {
     type: {
       in: ['body'],
       ...validateAndSanitizeString,
+      toLowerCase: true,
       custom: {
         options: (value: string) => checkStringIn(value, Object.values(TASK_TYPE)),
       },
@@ -131,6 +132,7 @@ export class TasksValidation {
       in: ['body'],
       ...validateAndSanitizeString,
       ...DEFAULT_STRING_LENGTH_VALIDATION,
+      toLowerCase: true,
     },
   };
 }
