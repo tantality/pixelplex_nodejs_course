@@ -6,7 +6,6 @@ export const validateAndSanitizeString: ParamSchema = {
     bail: true,
   },
   trim: true,
-  toLowerCase: true,
   customSanitizer: {
     options: replaceExtraSpaces,
   },
