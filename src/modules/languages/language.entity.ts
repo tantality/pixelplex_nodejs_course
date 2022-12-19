@@ -1,7 +1,6 @@
 import { Entity, Column, Index } from 'typeorm';
 import { CommonEntity } from '../../entities';
 import { MAX_NAME_LENGTH, MAX_CODE_LENGTH } from './languages.constants';
-
 import { ILanguage } from './types';
 
 @Entity('languages')
