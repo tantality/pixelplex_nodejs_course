@@ -58,11 +58,13 @@ export class CardsValidation {
       in: ['body'],
       ...validateAndSanitizeString,
       ...DEFAULT_STRING_LENGTH_VALIDATION,
+      toLowerCase: true,
     },
     'foreignWords.*': {
       in: ['body'],
       ...validateAndSanitizeString,
       ...DEFAULT_STRING_LENGTH_VALIDATION,
+      toLowerCase: true,
     },
     nativeWords: {
       ...CardsValidation.validateArray,
@@ -91,12 +93,14 @@ export class CardsValidation {
       optional: true,
       ...validateAndSanitizeString,
       ...DEFAULT_STRING_LENGTH_VALIDATION,
+      toLowerCase: true,
     },
     'foreignWords.*': {
       in: ['body'],
       optional: true,
       ...validateAndSanitizeString,
       ...DEFAULT_STRING_LENGTH_VALIDATION,
+      toLowerCase: true,
     },
     nativeWords: {
       optional: true,

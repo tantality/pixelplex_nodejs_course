@@ -34,6 +34,7 @@ export class LanguagesValidation {
       in: ['body'],
       ...validateAndSanitizeString,
       ...LanguagesValidation.codeLength,
+      toLowerCase: true,
     },
     name: {
       in: ['body'],
@@ -52,6 +53,7 @@ export class LanguagesValidation {
       optional: true,
       ...validateAndSanitizeString,
       ...LanguagesValidation.codeLength,
+      toLowerCase: true,
     },
     name: {
       in: ['body'],

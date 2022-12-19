@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 import * as express from 'express';
+import 'reflect-metadata';
 import { processError, processNotFoundEndpoint } from './middleware';
 import { mountAuthRouter } from './modules/auth/auth.router';
 import { mountCardsRouter } from './modules/cards/cards.router';
@@ -19,13 +19,4 @@ mountTasksRouter(app);
 app.use(processNotFoundEndpoint);
 app.use(processError);
 
-async function init(): Promise<void> {
-  try {
-    await app.listen(8080, () => console.log('Listening 8080'));
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-}
-
-init();
+export { app };

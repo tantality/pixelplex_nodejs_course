@@ -1,17 +1,14 @@
+import { Entity, Column, Index } from 'typeorm';
+import { CommonEntity } from '../../entities';
+import { MAX_NAME_LENGTH, MAX_CODE_LENGTH } from './languages.constants';
 import { ILanguage } from './types';
 
-let languageCounter = 1;
+@Entity('languages')
+@Index(['createdAt'])
+export class Language extends CommonEntity implements ILanguage {
+  @Column({ type: 'varchar', length: MAX_NAME_LENGTH })
+    name!: string;
 
-export class Language implements ILanguage {
-  id: number;
-
-  constructor(
-    public readonly name: string,
-    public readonly code: string,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {
-    this.id = languageCounter;
-    languageCounter += 1;
-  }
+  @Column({ type: 'varchar', length: MAX_CODE_LENGTH, unique: true })
+    code!: string;
 }
