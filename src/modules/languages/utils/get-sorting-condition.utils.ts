@@ -7,11 +7,15 @@ export const getSortingCondition = (sortBy: string, sortDir: string): FindOption
   let sortingCondition: FindOptionsOrder<Language> = {};
   const sortDirection: SORT_DIRECTION = sortDir as SORT_DIRECTION;
 
-  if (sortBy === LANGUAGE_SORT_BY.NAME) {
+  switch (sortBy) {
+  case LANGUAGE_SORT_BY.NAME: {
     sortingCondition = { name: sortDirection };
+    break;
   }
-  if (sortBy === LANGUAGE_SORT_BY.DATE) {
+  case LANGUAGE_SORT_BY.DATE: {
     sortingCondition = { createdAt: sortDirection };
+    break;
+  }
   }
 
   return sortingCondition;
