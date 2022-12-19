@@ -10,4 +10,4 @@ export const connectToDb = async (AppDataSource: DataSource): Promise<DataSource
       console.error('Error during Data Source initialization', err);
     });
   return AppDataSource;
-}; 
+};

@@ -23,4 +23,4 @@ mountTasksRouter(app);
 app.use(processNotFoundEndpoint);
 app.use(processError);
 
-export { app }; 
+export { app };

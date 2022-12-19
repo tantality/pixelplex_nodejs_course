@@ -17,4 +17,4 @@ async function init(): Promise<void> {
   }
 }
 
-init(); 
+init();
