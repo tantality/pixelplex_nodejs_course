@@ -123,7 +123,7 @@ export class TasksValidation {
     },
   };
 
-  static addAnswerToTask: Schema = {
+  static updateTask: Schema = {
     taskId: {
       in: ['params'],
       ...validateId,

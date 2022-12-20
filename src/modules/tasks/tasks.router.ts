@@ -24,7 +24,7 @@ router.post(
 );
 router.post(
   '/:taskId/answer',
-  checkSchema(TasksValidation.addAnswerToTask),
+  checkSchema(TasksValidation.updateTask),
   validatePayload<UpdateTaskRequest>,
   isAuth<UpdateTaskRequest>,
   TasksController.updateTask,
