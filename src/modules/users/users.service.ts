@@ -1,9 +1,10 @@
 import { FindOptionsWhere } from 'typeorm';
 import { BadRequestError, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError, USER_ALREADY_EXISTS_MESSAGE } from '../../errors';
 import { LanguagesService } from '../languages/languages.service';
-import { CreateUserData, UpdateUserBody, UpdateUserData } from './types';
+import { CreateUserData, UpdateUserData } from './types';
 import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
+import { isUpdateUserBodyType } from './utils';
 
 export class UsersService {
   static findOneByCondition = async (whereCondition: FindOptionsWhere<User>): Promise<User | null> => {
@@ -31,11 +32,11 @@ export class UsersService {
     const userToUpdate = await UsersService.findOneByCondition({ id: userId });
 
     let nativeLanguage = null;
-    if (userData as UpdateUserBody) {
-      nativeLanguage = await LanguagesService.findOneByCondition({ id: (userData as UpdateUserBody).nativeLanguageId });
-    }
-    if (!nativeLanguage) {
-      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
+    if (isUpdateUserBodyType(userData)) {
+      nativeLanguage = await LanguagesService.findOneByCondition({ id: userData.nativeLanguageId });
+      if (!nativeLanguage) {
+        throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
+      }
     }
 
     const updatedUser = await UsersRepository.update(userToUpdate as User, userId, userData);
