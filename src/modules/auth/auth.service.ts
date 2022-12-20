@@ -5,7 +5,16 @@ import { User } from '../users/user.entity';
 import { AuthDTO } from './auth.dto';
 import { SignUpRequest, LogInRequest } from './types';
 
-const user = new User(1, 'Angelina', 'email@gmail.com', 'email@gmail.com', 'qwerty123', 'user', 'awdwkmkwad243', new Date(), new Date());
+const user = new User();
+user.id = 1;
+user.name = 'Angelina';
+user.email = 'email@gmail.com';
+user.normalizedEmail = 'email@gmail.com';
+user.password = 'qwerty123';
+user.role = 'user';
+user.refreshToken = 'awdwkmkwad243';
+user.createdAt = new Date();
+user.updatedAt = new Date();
 const authDTO = new AuthDTO(user, 'amdwiwnf');
 
 export class AuthService {

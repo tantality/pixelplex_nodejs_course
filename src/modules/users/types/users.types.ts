@@ -1,3 +1,6 @@
+import { User } from '../user.entity';
+import { UpdateUserBody } from './body.types';
+
 export interface IUser {
   id: number;
   nativeLanguageId: number;
@@ -15,3 +18,6 @@ export enum USER_ROLE {
   USER = 'user',
   ADMIN = 'admin',
 }
+
+export type CreateUserData = Pick<User, 'name' | 'email' | 'normalizedEmail' | 'password' | 'nativeLanguageId'>;
+export type UpdateUserData = UpdateUserBody | Pick<User, 'refreshToken'>;

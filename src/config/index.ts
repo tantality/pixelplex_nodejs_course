@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import { DataSourceOptions } from 'typeorm';
+import { User } from '../modules/users/user.entity';
 import { Language } from '../modules/languages/language.entity';
 
 dotenv.config();
@@ -13,7 +14,7 @@ export const DB: DataSourceOptions = {
   database: 'flashcards',
   synchronize: false,
   logging: false,
-  entities: [Language],
+  entities: [Language, User],
 };
 
 export const config = {

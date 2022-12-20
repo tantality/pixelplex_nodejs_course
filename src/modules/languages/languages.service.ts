@@ -1,5 +1,6 @@
 import { FindOptionsWhere, ILike } from 'typeorm';
-import { BadRequestError, LANGUAGE_ALREADY_EXISTS_MESSAGE, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
+import { BadRequestError, LANGUAGE_ALREADY_EXISTS_MESSAGE, LANGUAGE_CANNOT_BE_DELETED_MESSAGE, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
+import { UsersService } from '../users/users.service';
 import { UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
 import { LanguagesRepository } from './languages.repository';
@@ -68,6 +69,11 @@ export class LanguagesService {
     const languageToDelete = await LanguagesService.findOneByCondition({ id: languageId });
     if (!languageToDelete) {
       throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
+    }
+
+    const languageIsUsedInUsers = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
+    if (languageIsUsedInUsers) {
+      throw new BadRequestError(LANGUAGE_CANNOT_BE_DELETED_MESSAGE);
     }
 
     await LanguagesRepository.delete(languageId);

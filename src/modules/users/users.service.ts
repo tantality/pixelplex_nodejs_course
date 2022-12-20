@@ -1,21 +1,48 @@
-/* eslint-disable require-await */
-import { Request } from 'express';
-import { logRequest } from '../../utils';
-import { UpdateUserRequest } from './types';
-import { UserDTO } from './user.dto';
+import { FindOptionsWhere } from 'typeorm';
+import { BadRequestError, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError, USER_ALREADY_EXISTS_MESSAGE, USER_NOT_FOUND_MESSAGE } from '../../errors';
+import { LanguagesService } from '../languages/languages.service';
+import { CreateUserData, UpdateUserBody, UpdateUserData } from './types';
 import { User } from './user.entity';
-
-const user = new User(1, 'Angelina', 'email@gmail.com', 'email@gmail.com', 'qwerty123', 'user', 'awdwkmkwad243', new Date(), new Date());
-const userDTO = new UserDTO(user);
+import { UsersRepository } from './users.repository';
 
 export class UsersService {
-  static findById = async (req: Request): Promise<UserDTO | null> => {
-    logRequest(req);
-    return userDTO;
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<User>): Promise<User | null> => {
+    const user = await UsersRepository.findOneByCondition(whereCondition);
+    return user;
   };
 
-  static update = async (req: UpdateUserRequest): Promise<UserDTO | null> => {
-    logRequest(req);
-    return userDTO;
+  static create = async (userData: CreateUserData): Promise<User> => {
+    const nativeLanguage = await LanguagesService.findOneByCondition({ id: userData.nativeLanguageId });
+    if (!nativeLanguage) {
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
+    }
+
+    const user = await UsersService.findOneByCondition({ normalizedEmail: userData.normalizedEmail });
+    if (user) {
+      throw new BadRequestError(USER_ALREADY_EXISTS_MESSAGE);
+    }
+
+    const createdUser = await UsersRepository.create(userData);
+
+    return createdUser;
+  };
+
+  static update = async (userId: number, userData: UpdateUserData): Promise<User> => {
+    const userToUpdate = await UsersService.findOneByCondition({ id: userId });
+    if (!userToUpdate) {
+      throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
+    }
+
+    let nativeLanguage = null;
+    if (userData as UpdateUserBody) {
+      nativeLanguage = await LanguagesService.findOneByCondition({ id: (userData as UpdateUserBody).nativeLanguageId });
+    }
+    if (!nativeLanguage) {
+      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
+    }
+
+    const updatedUser = await UsersRepository.update(userToUpdate, userId, userData);
+
+    return updatedUser;
   };
 }
