@@ -1,21 +1,46 @@
-import { ITask } from './types';
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
+import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
+import { Word } from '../cards/word.entity';
+import { User } from '../users/user.entity';
+import { ITask, TASK_STATUS, TASK_TYPE } from './types';
 
-let taskCounter = 1;
+@Index(['createdAt'])
+@Entity('tasks')
+export class Task extends CommonEntity implements ITask {
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'userId',
+  })
+    user!: Relation<User>;
 
-export class Task implements ITask {
-  id: number;
+  @Index()
+  @Column()
+    userId!: number;
 
-  constructor(
-    public readonly userId: number,
-    public readonly hiddenWordId: number,
-    public readonly type: string,
-    public readonly status: string,
-    public readonly correctAnswers: string[] | null,
-    public readonly receivedAnswer: string | null,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {
-    this.id = taskCounter;
-    taskCounter += 1;
-  }
+  @ManyToOne(() => Word, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'hiddenWordId',
+  })
+    hiddenWord!: Relation<Word>;
+
+  @Column()
+    hiddenWordId!: number;
+
+  @Column({ type: 'enum', enum: TASK_TYPE })
+    type!: string;
+
+  @Index()
+  @Column({ type: 'enum', enum: TASK_STATUS, default: TASK_STATUS.UNANSWERED })
+    status!: string;
+
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH, array: true, nullable: true })
+    correctAnswers!: string[];
+
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH, nullable: true })
+    receivedAnswer!: string;
 }

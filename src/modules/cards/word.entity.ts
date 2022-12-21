@@ -1,18 +1,35 @@
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
+import { MAX_STRING_LENGTH } from '../../validations/validations.constants';
+import { Language } from '../languages/language.entity';
+import { Card } from './card.entity';
 import { IWord } from './types';
 
-let wordCounter = 1;
+@Entity('words')
+export class Word extends CommonEntity implements IWord {
+  @ManyToOne(() => Card, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'cardId',
+  })
+    card!: Relation<Card>;
 
-export class Word implements IWord {
-  id: number;
+  @Index()
+  @Column()
+    cardId!: number;
 
-  constructor(
-    public readonly languageId: number,
-    public readonly cardId: number,
-    public readonly value: string,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {
-    this.id = wordCounter;
-    wordCounter += 1;
-  }
+  @ManyToOne(() => Language)
+  @JoinColumn({
+    name: 'languageId',
+  })
+    language!: Relation<Language>;
+
+  @Index()
+  @Column()
+    languageId!: number;
+
+  @Index()
+  @Column({ type: 'varchar', length: MAX_STRING_LENGTH })
+    value!: string;
 }

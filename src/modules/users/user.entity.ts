@@ -7,14 +7,14 @@ import { IUser, USER_ROLE } from './types';
 
 @Entity('users')
 export class User extends CommonEntity implements IUser {
-  @ManyToOne(() => Language)
+  @ManyToOne(() => Language, { nullable: true })
   @JoinColumn({
     name: 'nativeLanguageId',
   })
-    nativeLanguage!: Relation<Language>;
+    nativeLanguage!: Relation<Language> | null;
 
-  @Column()
-    nativeLanguageId!: number;
+  @Column({ nullable: true })
+    nativeLanguageId!: number | null;
 
   @Column({ type: 'varchar', length: MAX_NAME_LENGTH })
     name!: string;
