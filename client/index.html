@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./growl-notification/light-theme.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <title>Flashcards</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+      body {
+        background: #ccc;
+        font-family: "Roboto", sans-serif;
+      }
+      .growl-notification__body {
+        padding: 13px 20px;
+      }
+      .growl-notification__title {
+        font-size: 23px;
+      }
+      .growl-notification__desc {
+        padding-top: 5px;
+        font-size: 20px;
+      }
+      .growl-notification__title + .growl-notification__desc {
+        color: #4f4f4f;
+      }
+      .growl-notification__close-icon {
+        height: 23px;
+        width: 23px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="./growl-notification/growl-notification.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+      const socket = io("ws://localhost:8080");
+      socket.connect();
+      socket.on("connect", function () {
+        console.log("Connection established!");
+      });
+      socket.on("message", function (data) {
+        data = JSON.parse(data);
+        try {
+          switch (data.event) {
+            case "creating-language":
+              const { code, name, createdAt } = JSON.parse(data.payload);
+              GrowlNotification.notify({
+                title: "Added a new language!",
+                description: `code: <b>${code}</b> <br/> name: <b>${name} </b>  <br/> created at: <b>${new Date(createdAt).toLocaleString()} </b>`,
+                type: "alert",
+                position: "bottom-right",
+                closeTimeout: 0,
+              });
+              break;
+            default:
+              console.log("Unknown event");
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      });
+    </script>
+  </body>
+</html>
