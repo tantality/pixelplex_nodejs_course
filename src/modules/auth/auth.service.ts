@@ -42,8 +42,8 @@ export class AuthService {
       throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
     }
 
-    const isPasswordsEquals = await bcrypt.compare(password, user.password);
-    if (!isPasswordsEquals) {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       throw new UnauthorizedError(INVALID_PASSWORD_MESSAGE);
     }
 
