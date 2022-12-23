@@ -1,15 +1,20 @@
 /* eslint-disable no-console */
+import http from 'http';
 import { DataSource } from 'typeorm';
 import { app } from './app';
 import { config } from './config';
 import AppDataSource from './data-source';
-import { connectToDb } from './utils';
+import { connectToDb, initSocket } from './utils';
 
 let dbConnection: DataSource;
 async function init(): Promise<void> {
   try {
     dbConnection = await connectToDb(AppDataSource);
-    app.listen(config.DEV.PORT, () => console.log(`Listening ${config.DEV.PORT}`));
+    const server = http.createServer(app);
+
+    initSocket(server);
+
+    server.listen(config.DEV.PORT, () => console.log(`Listening ${config.DEV.PORT}`));
   } catch (error) {
     console.log(error);
     dbConnection.destroy();
