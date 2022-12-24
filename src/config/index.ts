@@ -14,7 +14,7 @@ export const DB: DataSourceOptions = {
   username: 'postgres',
   password: process.env.DB_PASSWORD,
   database: 'flashcards',
-  synchronize: false,
+  synchronize: true,
   logging: false,
   entities: [Language, User, Token],
   migrations: Object.values(Migrations),
