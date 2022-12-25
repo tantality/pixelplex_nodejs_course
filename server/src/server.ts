@@ -4,7 +4,8 @@ import { DataSource } from 'typeorm';
 import { app } from './app';
 import { config } from './config';
 import AppDataSource from './data-source';
-import { connectToDb, initSocket } from './utils';
+import { initSocket } from './real-time';
+import { connectToDb } from './utils';
 
 let dbConnection: DataSource;
 async function init(): Promise<void> {

@@ -2,7 +2,8 @@ import { FindOptionsWhere, ILike } from 'typeorm';
 import { BadRequestError, LANGUAGE_ALREADY_EXISTS_MESSAGE, LANGUAGE_CANNOT_BE_DELETED_MESSAGE, LANGUAGE_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
 import { UsersService } from '../users/users.service';
 import { CardsService } from '../cards/cards.service';
-import { messageEmitter } from '../../utils';
+import { languageEventEmitter } from '../../real-time/language/language.handler';
+import { LANGUAGE_EVENTS } from '../../real-time/language/language.types';
 import { UpdateLanguageBody, CreateLanguageBody, GetLanguagesQuery } from './types';
 import { LanguageDTO } from './language.dto';
 import { LanguagesRepository } from './languages.repository';
@@ -47,7 +48,7 @@ export class LanguagesService {
 
     const createdLanguage = await LanguagesRepository.create(body);
 
-    messageEmitter.emit('creating-language', createdLanguage);
+    languageEventEmitter.emit(LANGUAGE_EVENTS.CREATING, createdLanguage);
 
     return new LanguageDTO(createdLanguage);
   };
