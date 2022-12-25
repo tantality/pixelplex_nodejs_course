@@ -1,9 +1,9 @@
 import { ILanguage } from '../../modules/languages/types';
 
 export enum LANGUAGE_EVENTS {
-  CREATING = 'creating-language',
+  CREATE = 'create-language',
 }
 
 export type LanguageEvents = {
-  [LANGUAGE_EVENTS.CREATING]: (payload: ILanguage) => void;
+  [LANGUAGE_EVENTS.CREATE]: (payload: ILanguage) => void;
 };

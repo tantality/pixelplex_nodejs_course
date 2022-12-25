@@ -8,11 +8,11 @@ import { LanguageEvents, LANGUAGE_EVENTS } from './language.types';
 export const languageEventEmitter = new EventEmitter() as TypedEmitter<LanguageEvents>;
 
 export const registerLanguageHandlers = (io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>): void => {
-  const creatingLanguage = (payload: ILanguage): void => {
+  const createLanguage = (payload: ILanguage): void => {
     io.sockets.sockets.forEach((client) =>
-      client.send(JSON.stringify({ event: LANGUAGE_EVENTS.CREATING, payload: JSON.stringify(payload) })),
+      client.send(JSON.stringify({ event: LANGUAGE_EVENTS.CREATE, payload: JSON.stringify(payload) })),
     );
   };
 
-  languageEventEmitter.on(LANGUAGE_EVENTS.CREATING, creatingLanguage);
+  languageEventEmitter.on(LANGUAGE_EVENTS.CREATE, createLanguage);
 };

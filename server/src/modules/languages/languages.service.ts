@@ -48,7 +48,7 @@ export class LanguagesService {
 
     const createdLanguage = await LanguagesRepository.create(body);
 
-    languageEventEmitter.emit(LANGUAGE_EVENTS.CREATING, createdLanguage);
+    languageEventEmitter.emit(LANGUAGE_EVENTS.CREATE, createdLanguage);
 
     return new LanguageDTO(createdLanguage);
   };

@@ -50,7 +50,7 @@
         data = JSON.parse(data);
         try {
           switch (data.event) {
-            case "creating-language":
+            case "create-language":
               const { code, name, createdAt } = JSON.parse(data.payload);
               GrowlNotification.notify({
                 title: "Added a new language!",
