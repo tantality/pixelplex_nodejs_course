@@ -26,6 +26,25 @@ export class CardsRepository {
       )`;
   };
 
+  private static getSortingCondition = (sortBy: string, sortDirection: string, currentProperty: CARD_SORT_BY): string => {
+    let sortingCondition = '';
+
+    if (sortBy === currentProperty) {
+      switch (sortBy) {
+      case CARD_SORT_BY.WORD: {
+        sortingCondition = `ORDER BY "w"."value" ${sortDirection} `;
+        break;
+      }
+      case CARD_SORT_BY.DATE: {
+        sortingCondition = `ORDER BY "c"."createdAt" ${sortDirection}`;
+        break;
+      }
+      }
+    }
+
+    return sortingCondition;
+  };
+
   static findAndCountAll = async (
     userId: number,
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
@@ -35,8 +54,8 @@ export class CardsRepository {
       additionalLanguageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
     }
 
-    const orderByDateCondition = sortBy === CARD_SORT_BY.DATE ? `ORDER BY "c"."createdAt" ${sortDirection}` : '';
-    const orderByWordCondition = sortBy === CARD_SORT_BY.WORD ? `ORDER BY "w"."value" ${sortDirection} ` : '';
+    const orderByDateCondition = CardsRepository.getSortingCondition(sortBy, sortDirection, CARD_SORT_BY.DATE);
+    const orderByWordCondition = CardsRepository.getSortingCondition(sortBy, sortDirection, CARD_SORT_BY.WORD);
 
     let searchByWordCondition = '';
     if (search) {
