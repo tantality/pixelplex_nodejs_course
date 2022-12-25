@@ -3,6 +3,7 @@ import { DataSourceOptions } from 'typeorm';
 import { User } from '../modules/users/user.entity';
 import { Language } from '../modules/languages/language.entity';
 import * as Migrations from '../migrations';
+import { Token } from '../modules/auth/token.entity';
 import { Card } from '../modules/cards/card.entity';
 import { Word } from '../modules/cards/word.entity';
 
@@ -17,7 +18,7 @@ export const DB: DataSourceOptions = {
   database: 'flashcards',
   synchronize: true,
   logging: false,
-  entities: [Language, User, Card, Word],
+  entities: [Language, User, Token, Card, Word],
   migrations: Object.values(Migrations),
   migrationsRun: true,
 };
