@@ -1,5 +1,5 @@
 import { DeepPartial, FindOptionsWhere } from 'typeorm';
-import { CreateUserData, UpdateUserData } from './types';
+import { CreateUserData, UpdateUserBody } from './types';
 import { User } from './user.entity';
 
 export class UsersRepository {
@@ -15,8 +15,8 @@ export class UsersRepository {
     return savedUser;
   };
 
-  static update = async (currentUser: User, id: number, userData: UpdateUserData): Promise<User> => {
-    await User.update({ id }, { ...currentUser, ...userData });
+  static update = async (currentUser: User, id: number, body: UpdateUserBody): Promise<User> => {
+    await User.update({ id }, { ...currentUser, ...body });
 
     const updatedUser = (await UsersRepository.findOneByCondition({ id })) as User;
 
