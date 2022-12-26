@@ -1,12 +1,12 @@
 import { FindOptionsWhere } from 'typeorm';
 import { CARD_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
+import { checkLanguagesValidity } from '../../utils';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardsRepository } from './cards.repository';
 import { CreateCardBody, UpdateCardBody, GetCardsQuery } from './types';
-import { checkLanguagesValidity } from './utils';
 import { WordsService } from './words.service';
 
 export class CardsService {

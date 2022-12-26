@@ -4,8 +4,8 @@ import {
   NotFoundError,
   LANGUAGE_NOT_FOUND_MESSAGE,
   NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
-} from '../../../errors';
-import { LanguagesService } from '../../languages/languages.service';
+} from '../errors';
+import { LanguagesService } from '../modules/languages/languages.service';
 
 export const checkLanguagesValidity = async (nativeLanguageId: number | null, foreignLanguageId?: number): Promise<void> => {
   if (!nativeLanguageId) {
