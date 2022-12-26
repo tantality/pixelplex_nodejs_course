@@ -8,7 +8,6 @@ export interface IUser {
   normalizedEmail: string;
   password: string;
   role: string;
-  refreshToken: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,4 +18,3 @@ export enum USER_ROLE {
 }
 
 export type CreateUserData = Pick<IUser, 'name' | 'email' | 'normalizedEmail' | 'password'> & { nativeLanguageId: number };
-export type UpdateUserData = UpdateUserBody | Pick<IUser, 'refreshToken'>;
