@@ -26,23 +26,21 @@ export class CardsRepository {
       )`;
   };
 
-  private static getSortingCondition = (sortBy: string, sortDirection: string, currentProperty: CARD_SORT_BY): string => {
-    let sortingCondition = '';
-
-    if (sortBy === currentProperty) {
-      switch (sortBy) {
-      case CARD_SORT_BY.WORD: {
-        sortingCondition = `ORDER BY "w"."value" ${sortDirection} `;
-        break;
-      }
-      case CARD_SORT_BY.DATE: {
-        sortingCondition = `ORDER BY "c"."createdAt" ${sortDirection}`;
-        break;
-      }
-      }
+  private static getSortingCondition = (
+    sortBy: string,
+    sortDirection: string,
+  ): { orderByDateCondition: string; orderByWordCondition: string } => {
+    switch (sortBy) {
+    case CARD_SORT_BY.WORD: {
+      return { orderByDateCondition: '', orderByWordCondition: `ORDER BY "w"."value" ${sortDirection}` };
     }
-
-    return sortingCondition;
+    case CARD_SORT_BY.DATE: {
+      return { orderByDateCondition: `ORDER BY "c"."createdAt" ${sortDirection}`, orderByWordCondition: '' };
+    }
+    default: {
+      return { orderByDateCondition: '', orderByWordCondition: '' };
+    }
+    }
   };
 
   static findAndCountAll = async (
@@ -54,8 +52,7 @@ export class CardsRepository {
       additionalLanguageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
     }
 
-    const orderByDateCondition = CardsRepository.getSortingCondition(sortBy, sortDirection, CARD_SORT_BY.DATE);
-    const orderByWordCondition = CardsRepository.getSortingCondition(sortBy, sortDirection, CARD_SORT_BY.WORD);
+    const { orderByDateCondition, orderByWordCondition } = CardsRepository.getSortingCondition(sortBy, sortDirection);
 
     let searchByWordCondition = '';
     if (search) {
