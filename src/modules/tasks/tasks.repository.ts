@@ -6,6 +6,15 @@ import { CreateTaskData, GetStatisticsQuery, GetStatisticsQueryResult, Statistic
 import { getStatisticsByLanguage, getTasksAndTheirNumber } from './utils';
 
 export class TasksRepository {
+  private static getAdditionalDatesCondition = (fromDate?: Date, toDate?: Date): string => {
+    let additionalDatesCondition = ' AND "t"."createdAt" BETWEEN ';
+    const fromDateQueryString = fromDate ? `'${fromDate.toISOString()}' AND ` : 'LEAST("t"."createdAt") AND ';
+    const toDateQueryString = toDate ? `'${toDate.toISOString()}'` : 'GREATEST("t"."createdAt")';
+    additionalDatesCondition += fromDateQueryString + toDateQueryString;
+
+    return additionalDatesCondition;
+  };
+
   static findAndCountAll = async (
     skip: number,
     take: number,
@@ -66,10 +75,7 @@ export class TasksRepository {
   ): Promise<{ statistics: Statistics[] }> => {
     const additionalLanguageIdCondition = languageIds ? ` AND "w"."languageId" IN (${languageIds.join(',')})` : '';
 
-    let additionalDatesCondition = ' AND "t"."createdAt" BETWEEN ';
-    const fromDateQueryString = fromDate ? `'${fromDate.toISOString()}' AND ` : 'LEAST("t"."createdAt") AND ';
-    const toDateQueryString = toDate ? `'${toDate.toISOString()}'` : 'GREATEST("t"."createdAt")';
-    additionalDatesCondition += fromDateQueryString + toDateQueryString;
+    const additionalDatesCondition = TasksRepository.getAdditionalDatesCondition(fromDate, toDate);
 
     const statisticsByLanguageQueryResult: GetStatisticsQueryResult = await AppDataSource.query(`
       SELECT 
