@@ -1,18 +1,40 @@
+import { Entity, Column, Index, Relation, JoinColumn, ManyToOne } from 'typeorm';
+import { CommonEntity } from '../../entities';
+import { Language } from '../languages/language.entity';
+import { User } from '../users/user.entity';
 import { ICard } from './types';
 
-let cardCounter = 1;
+@Index(['createdAt'])
+@Index(['nativeLanguageId', 'foreignLanguageId'])
+@Entity('cards')
+export class Card extends CommonEntity implements ICard {
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'userId',
+  })
+    user!: Relation<User>;
 
-export class Card implements ICard {
-  id: number;
+  @Index()
+  @Column()
+    userId!: number;
 
-  constructor(
-    public readonly userId: number,
-    public readonly nativeLanguageId: number,
-    public readonly foreignLanguageId: number,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {
-    this.id = cardCounter;
-    cardCounter += 1;
-  }
+  @ManyToOne(() => Language)
+  @JoinColumn({
+    name: 'nativeLanguageId',
+  })
+    nativeLanguage!: Relation<Language>;
+
+  @Column()
+    nativeLanguageId!: number;
+
+  @ManyToOne(() => Language)
+  @JoinColumn({
+    name: 'foreignLanguageId',
+  })
+    foreignLanguage!: Relation<Language>;
+
+  @Column()
+    foreignLanguageId!: number;
 }
