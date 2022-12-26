@@ -3,20 +3,56 @@ import AppDataSource from '../../data-source';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardToTransform, CARD_SORT_BY, GetCardsQuery } from './types';
-import { createSubqueryToFindWords, createSubqueryToGroupWords, getCardsAndTheirNumber } from './utils';
+import { getCardsAndTheirNumber } from './utils';
 
 export class CardsRepository {
+  private static createSubqueryToFindWords = (userId: number, languageIdType: 'foreignLanguageId' | 'nativeLanguageId'): string => {
+    return `
+      (
+        SELECT "w"."id" AS "id", "w"."value" AS "value", "w"."cardId" AS "cardId"
+        FROM "cards" AS "c" LEFT JOIN "words" AS "w"
+              ON "c"."id"="w"."cardId"
+        WHERE "c"."userId"=${userId} AND "c"."${languageIdType}" = "w"."languageId"
+        GROUP BY  "w"."cardId", "w"."id"
+      )`;
+  };
+
+  private static createSubqueryToGroupWords = (findWordsSubquery: string, orderByWordCondition: string): string => {
+    return `
+      (
+        SELECT ARRAY_AGG("w"."id" ${orderByWordCondition}) AS "ids", ARRAY_AGG("w"."value" ${orderByWordCondition}) AS "values", "w"."cardId" AS "cardId"
+        FROM ${findWordsSubquery} AS "w"
+        GROUP BY "w"."cardId"
+      )`;
+  };
+
+  private static getSortingCondition = (
+    sortBy: string,
+    sortDirection: string,
+  ): { orderByDateCondition: string; orderByWordCondition: string } => {
+    switch (sortBy) {
+    case CARD_SORT_BY.WORD: {
+      return { orderByDateCondition: '', orderByWordCondition: `ORDER BY "w"."value" ${sortDirection}` };
+    }
+    case CARD_SORT_BY.DATE: {
+      return { orderByDateCondition: `ORDER BY "c"."createdAt" ${sortDirection}`, orderByWordCondition: '' };
+    }
+    default: {
+      return { orderByDateCondition: '', orderByWordCondition: '' };
+    }
+    }
+  };
+
   static findAndCountAll = async (
     userId: number,
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
   ): Promise<{ count: number; cards: CardDTO[] }> => {
     let additionalLanguageIdCondition = '';
-    if (typeof languageId === 'number') {
+    if (languageId) {
       additionalLanguageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
     }
 
-    const orderByDateCondition = sortBy === CARD_SORT_BY.DATE ? `ORDER BY "c"."createdAt" ${sortDirection}` : '';
-    const orderByWordCondition = sortBy === CARD_SORT_BY.WORD ? `ORDER BY "w"."value" ${sortDirection} ` : '';
+    const { orderByDateCondition, orderByWordCondition } = CardsRepository.getSortingCondition(sortBy, sortDirection);
 
     let searchByWordCondition = '';
     if (search) {
@@ -27,10 +63,10 @@ export class CardsRepository {
       `;
     }
 
-    const findNativeWordsSubquery = createSubqueryToFindWords(userId, 'nativeLanguageId');
-    const groupNativeWordsSubquery = createSubqueryToGroupWords(findNativeWordsSubquery, orderByWordCondition);
-    const findForeignWordsSubquery = createSubqueryToFindWords(userId, 'foreignLanguageId');
-    const groupForeignWordsSubquery = createSubqueryToGroupWords(findForeignWordsSubquery, orderByWordCondition);
+    const findNativeWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'nativeLanguageId');
+    const groupNativeWordsSubquery = CardsRepository.createSubqueryToGroupWords(findNativeWordsSubquery, orderByWordCondition);
+    const findForeignWordsSubquery = CardsRepository.createSubqueryToFindWords(userId, 'foreignLanguageId');
+    const groupForeignWordsSubquery = CardsRepository.createSubqueryToGroupWords(findForeignWordsSubquery, orderByWordCondition);
 
     const findAndCountCardsSubquery = `
     (

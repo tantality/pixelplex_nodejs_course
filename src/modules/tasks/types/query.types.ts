@@ -4,7 +4,7 @@ export type GetTasksQuery = {
   limit: number;
   sortDirection: string;
   sortBy: string;
-  languageId?: number | string;
+  languageId?: number;
   taskStatus?: string;
 };
 

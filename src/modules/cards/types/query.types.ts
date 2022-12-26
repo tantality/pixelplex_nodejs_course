@@ -4,5 +4,5 @@ export type GetCardsQuery = {
   limit: number;
   sortDirection: string;
   sortBy: string;
-  languageId?: number | string;
+  languageId?: number;
 };
