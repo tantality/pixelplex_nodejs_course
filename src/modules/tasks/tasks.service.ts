@@ -1,16 +1,13 @@
 import { FindOptionsWhere, Like } from 'typeorm';
 import {
   ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE,
-  LANGUAGE_NOT_FOUND_MESSAGE,
-  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
   NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE,
-  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
   TASK_NOT_FOUND_MESSAGE,
 } from '../../errors';
 import { BadRequestError, NotFoundError } from '../../errors/app.error';
+import { checkLanguagesValidity } from '../../utils';
 import { Word } from '../cards/word.entity';
 import { WordsService } from '../cards/words.service';
-import { LanguagesService } from '../languages/languages.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { TaskDTO } from './task.dto';
@@ -84,19 +81,11 @@ export class TasksService {
   };
 
   static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
-    const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
+    let { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
 
-    const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-    if (!foreignLanguage) {
-      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    nativeLanguageId = nativeLanguageId as number;
 
     const wordLanguageId = type === TASK_TYPE.TO_NATIVE ? foreignLanguageId : nativeLanguageId;
     const hiddenWord = await WordsService.findRandomOne(userId, nativeLanguageId, foreignLanguageId, wordLanguageId);
