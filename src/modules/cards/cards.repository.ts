@@ -50,7 +50,7 @@ export class CardsRepository {
     { search, sortBy, sortDirection, limit, offset, languageId }: GetCardsQuery,
   ): Promise<{ count: number; cards: CardDTO[] }> => {
     let additionalLanguageIdCondition = '';
-    if (typeof languageId === 'number') {
+    if (languageId) {
       additionalLanguageIdCondition = `AND ("c"."nativeLanguageId"=${languageId} OR "c"."foreignLanguageId"=${languageId})`;
     }
 
