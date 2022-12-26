@@ -1,19 +1,12 @@
 import { FindOptionsWhere } from 'typeorm';
-import {
-  BadRequestError,
-  CARD_NOT_FOUND_MESSAGE,
-  LANGUAGE_NOT_FOUND_MESSAGE,
-  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
-  NotFoundError,
-  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
-} from '../../errors';
-import { LanguagesService } from '../languages/languages.service';
+import { CARD_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
 import { Card } from './card.entity';
 import { CardsRepository } from './cards.repository';
 import { CreateCardBody, UpdateCardBody, GetCardsQuery } from './types';
+import { checkLanguagesValidity } from './utils';
 import { WordsService } from './words.service';
 
 export class CardsService {
@@ -28,19 +21,11 @@ export class CardsService {
   };
 
   static create = async (userId: number, { nativeWords, foreignLanguageId, foreignWords }: CreateCardBody): Promise<CardDTO> => {
-    const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
+    let { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
 
-    const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-    if (!foreignLanguage) {
-      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    nativeLanguageId = nativeLanguageId as number;
 
     const createdCard = await CardsRepository.create(userId, nativeLanguageId, foreignLanguageId);
     const createdNativeWordsDTO = WordsService.create({
@@ -69,22 +54,9 @@ export class CardsService {
       throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
-    let foreignLanguage = null;
-    if (foreignLanguageId) {
-      foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-      if (!foreignLanguage) {
-        throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-      }
-    }
-
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
     let updatedForeignWordsDTO = null;
     if (foreignLanguageId && !foreignWords) {
