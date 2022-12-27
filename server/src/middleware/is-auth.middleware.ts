@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE, AUTHORIZATION_HEADER_IS_MISSING_MESSAGE, UnauthorizedError } from '../errors';
-import { JWTService } from '../modules/auth/jwt.service';
+import { TokensService } from '../modules/auth/tokens.service';
 
 export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
   try {
@@ -11,7 +11,7 @@ export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
     }
 
     const accessToken = authHeader.split(' ')[1];
-    const verifiedAccessToken = JWTService.validateAccessToken(accessToken);
+    const verifiedAccessToken = TokensService.validateAccessToken(accessToken);
 
     request.userId = verifiedAccessToken.userId;
     request.role = verifiedAccessToken.role;

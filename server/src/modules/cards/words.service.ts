@@ -1,4 +1,4 @@
-import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 import { CreateWordsData, FindAnswersQueryResult, UpdateWordsData, WordToCreate } from './types';
 import { getWordsDTO, prepareWordsToCreate } from './utils';
 import { WordDTO } from './word.dto';
@@ -6,8 +6,8 @@ import { Word } from './word.entity';
 import { WordsRepository } from './words.repository';
 
 export class WordsService {
-  static findAllByCondition = async (whereCondition: FindOptionsWhere<Word>): Promise<Word[] | null> => {
-    const words = await WordsRepository.findAllByCondition(whereCondition);
+  static findAllByCondition = async (condition: FindManyOptions<Word>): Promise<Word[] | null> => {
+    const words = await WordsRepository.findAllByCondition(condition);
     return words;
   };
 
@@ -26,8 +26,15 @@ export class WordsService {
     return word;
   };
 
-  static findCorrectAnswersToTask = async (findCardIdsQueryBuilder: SelectQueryBuilder<Word>, languageId: number): Promise<string[]> => {
-    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(findCardIdsQueryBuilder, languageId);
+  static findCorrectAnswersToTask = async (
+    userId: number,
+    cardNativeLanguageId: number,
+    cardForeignLanguageId: number,
+    wordValue: string,
+    wordLanguageId: number,
+  ): Promise<string[]> => {
+    const findCardIdsQueryBuilder = WordsRepository.createQueryBuilderToFindCardIds(userId, cardNativeLanguageId, cardForeignLanguageId, wordValue);
+    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(findCardIdsQueryBuilder, wordLanguageId);
     if (!answers) {
       return [];
     }
@@ -50,10 +57,14 @@ export class WordsService {
   static update = async (cardLanguageId: number, wordsData: UpdateWordsData): Promise<WordDTO[]> => {
     let updatedWords: Word[] | null = null;
 
+    const whereCondition: FindOptionsWhere<Word> = {
+      cardId: wordsData.cardId,
+      languageId: cardLanguageId,
+    };
+
     if (!wordsData.values) {
       updatedWords = (await WordsService.findAllByCondition({
-        cardId: wordsData.cardId,
-        languageId: cardLanguageId,
+        where: whereCondition,
       })) as Word[];
     }
 

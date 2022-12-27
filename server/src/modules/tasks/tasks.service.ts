@@ -1,16 +1,9 @@
-import { FindOptionsWhere, Like } from 'typeorm';
-import {
-  ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE,
-  LANGUAGE_NOT_FOUND_MESSAGE,
-  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
-  NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE,
-  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
-  TASK_NOT_FOUND_MESSAGE,
-} from '../../errors';
+import { FindOptionsWhere } from 'typeorm';
+import { ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE, NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE, TASK_NOT_FOUND_MESSAGE } from '../../errors';
 import { BadRequestError, NotFoundError } from '../../errors/app.error';
+import { checkLanguagesValidity } from '../../utils';
 import { Word } from '../cards/word.entity';
 import { WordsService } from '../cards/words.service';
-import { LanguagesService } from '../languages/languages.service';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { TaskDTO } from './task.dto';
@@ -19,56 +12,11 @@ import { TasksRepository } from './tasks.repository';
 import { Statistics, TASK_TYPE, CreatedTaskDTO, TASK_STATUS, UpdateTaskParams, TaskIdWithWordData } from './types';
 import { CreateTaskBody, UpdateTaskBody } from './types/body.types';
 import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
-import { getTaskStatus, createQueryBuilderToFindCardIds } from './utils';
+import { getAnswerStatus } from './utils';
 
 export class TasksService {
-  static findAndCountAll = async (
-    userId: number,
-    { search, sortDirection, limit, offset, taskStatus, languageId }: GetTasksQuery,
-  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
-    const whereCondition: FindOptionsWhere<Task>[] = [];
-    let baseCondition: FindOptionsWhere<Task> = { userId, hiddenWord: {} as FindOptionsWhere<Word> };
-
-    if (search) {
-      baseCondition = {
-        ...baseCondition,
-        hiddenWord: {
-          value: Like(`%${search}%`),
-        },
-      };
-    }
-
-    if (taskStatus) {
-      baseCondition = { ...baseCondition, status: taskStatus };
-    }
-
-    let taskWithNativeLanguageCondition: FindOptionsWhere<Task> | null = null;
-    let taskWithForeignLanguageCondition: FindOptionsWhere<Task> | null = null;
-
-    if (languageId) {
-      taskWithNativeLanguageCondition = {
-        hiddenWord: {
-          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
-          card: {
-            nativeLanguageId: languageId,
-          },
-        } as FindOptionsWhere<Word>,
-      } as FindOptionsWhere<Task>;
-
-      taskWithForeignLanguageCondition = {
-        hiddenWord: {
-          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
-          card: {
-            foreignLanguageId: languageId,
-          },
-        } as FindOptionsWhere<Word>,
-      } as FindOptionsWhere<Task>;
-    }
-
-    whereCondition.push({ ...baseCondition, ...taskWithNativeLanguageCondition });
-    whereCondition.push({ ...baseCondition, ...taskWithForeignLanguageCondition });
-
-    const tasksAndTheirNumber = await TasksRepository.findAndCountAll(offset, limit, sortDirection, whereCondition);
+  static findAndCountAll = async (userId: number, query: GetTasksQuery): Promise<{ count: number; tasks: TaskDTO[] }> => {
+    const tasksAndTheirNumber = await TasksRepository.findAndCountAll(userId, query);
 
     return tasksAndTheirNumber;
   };
@@ -84,19 +32,11 @@ export class TasksService {
   };
 
   static create = async (userId: number, { type, foreignLanguageId }: CreateTaskBody): Promise<CreatedTaskDTO> => {
-    const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
+    let { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
 
-    const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-    if (!foreignLanguage) {
-      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    nativeLanguageId = nativeLanguageId as number;
 
     const wordLanguageId = type === TASK_TYPE.TO_NATIVE ? foreignLanguageId : nativeLanguageId;
     const hiddenWord = await WordsService.findRandomOne(userId, nativeLanguageId, foreignLanguageId, wordLanguageId);
@@ -122,34 +62,33 @@ export class TasksService {
     } = (await WordsService.findOneWithJoinedCard(hiddenWordId)) as Word;
 
     const languageId = type === TASK_TYPE.TO_NATIVE ? nativeLanguageId : foreignLanguageId;
-    const findCardIdsQueryBuilder = createQueryBuilderToFindCardIds(userId, nativeLanguageId, foreignLanguageId, value);
-    const answers = await WordsService.findCorrectAnswersToTask(findCardIdsQueryBuilder, languageId);
+    const correctAnswers = await WordsService.findCorrectAnswersToTask(userId, nativeLanguageId, foreignLanguageId, value, languageId);
 
-    return answers;
+    return correctAnswers;
   };
 
   static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {
-    const task = await TasksService.findOneByCondition({ id: taskId, userId });
-    if (!task) {
+    const taskToUpdate = await TasksService.findOneByCondition({ id: taskId, userId });
+    if (!taskToUpdate) {
       throw new NotFoundError(TASK_NOT_FOUND_MESSAGE);
     }
 
-    if (task.status !== TASK_STATUS.UNANSWERED) {
+    const { id, hiddenWordId, type, status } = taskToUpdate;
+
+    if (status !== TASK_STATUS.UNANSWERED) {
       throw new BadRequestError(ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE);
     }
 
-    const { id, hiddenWordId, type } = task;
-
     const correctAnswers = await TasksService.findCorrectAnswers(hiddenWordId, userId, type);
-    const status = getTaskStatus(correctAnswers, answer);
-    const updatedTask = await TasksRepository.update(id, correctAnswers, answer, status);
+    const answerStatus = getAnswerStatus(correctAnswers, answer);
+    const updatedTask = await TasksRepository.update(id, correctAnswers, answer, answerStatus);
 
     const {
       hiddenWord: {
         value,
         card: { nativeLanguageId, foreignLanguageId },
       },
-    } = (await TasksRepository.findTaskPartForDTO(id)) as TaskIdWithWordData;
+    } = (await TasksRepository.findTaskPartToCreateDTO(id)) as TaskIdWithWordData;
 
     return new TaskDTO(updatedTask, value, nativeLanguageId, foreignLanguageId);
   };

@@ -1,13 +1,6 @@
 import { FindOptionsWhere } from 'typeorm';
-import {
-  BadRequestError,
-  CARD_NOT_FOUND_MESSAGE,
-  LANGUAGE_NOT_FOUND_MESSAGE,
-  NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE,
-  NotFoundError,
-  NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE,
-} from '../../errors';
-import { LanguagesService } from '../languages/languages.service';
+import { CARD_NOT_FOUND_MESSAGE, NotFoundError } from '../../errors';
+import { checkLanguagesValidity } from '../../utils';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { CardDTO } from './card.dto';
@@ -22,39 +15,33 @@ export class CardsService {
     return cardsAndTheirNumber;
   };
 
-  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[] ): Promise<Card | null> => {
+  static findOneByCondition = async (whereCondition: FindOptionsWhere<Card> | FindOptionsWhere<Card>[]): Promise<Card | null> => {
     const card = await CardsRepository.findOneByCondition(whereCondition);
     return card;
   };
 
   static create = async (userId: number, { nativeWords, foreignLanguageId, foreignWords }: CreateCardBody): Promise<CardDTO> => {
-    const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
+    let { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
 
-    const foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-    if (!foreignLanguage) {
-      throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    nativeLanguageId = nativeLanguageId as number;
 
     const createdCard = await CardsRepository.create(userId, nativeLanguageId, foreignLanguageId);
-    const createdNativeWordsDTO = await WordsService.create({
+    const createdNativeWords = WordsService.create({
       cardId: createdCard.id,
       languageId: nativeLanguageId,
       values: nativeWords,
     });
-    const createdForeignWordsDTO = await WordsService.create({
+    const createdForeignWords = WordsService.create({
       cardId: createdCard.id,
       languageId: foreignLanguageId,
       values: foreignWords,
     });
 
-    return new CardDTO(createdCard, createdNativeWordsDTO, createdForeignWordsDTO);
+    const createdWords = await Promise.all([createdNativeWords, createdForeignWords]);
+
+    return new CardDTO(createdCard, ...createdWords);
   };
 
   static update = async (
@@ -67,45 +54,34 @@ export class CardsService {
       throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
-    let foreignLanguage = null;
-    if (foreignLanguageId) {
-      foreignLanguage = await LanguagesService.findOneByCondition({ id: foreignLanguageId });
-      if (!foreignLanguage) {
-        throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
-      }
-    }
-
     const { nativeLanguageId } = (await UsersService.findOneByCondition({ id: userId })) as User;
-    if (!nativeLanguageId) {
-      throw new BadRequestError(NO_NATIVE_LANGUAGE_SET_FOR_THE_USER_MESSAGE);
-    }
 
-    if (foreignLanguageId === nativeLanguageId) {
-      throw new BadRequestError(NATIVE_AND_FOREIGN_LANGUAGE_ARE_EQUAL_MESSAGE);
-    }
+    await checkLanguagesValidity(nativeLanguageId, foreignLanguageId);
 
-    let updatedForeignWordsDTO = null;
+    let updatedForeignWords = null;
     if (foreignLanguageId && !foreignWords) {
-      updatedForeignWordsDTO = await WordsService.updateLanguageId(cardId, cardToUpdate.foreignLanguageId, foreignLanguageId);
+      updatedForeignWords = WordsService.updateLanguageId(cardId, cardToUpdate.foreignLanguageId, foreignLanguageId);
     }
 
-    const updatedNativeWordsDTO = await WordsService.update(cardToUpdate.nativeLanguageId, {
+    const updatedNativeWords = WordsService.update(cardToUpdate.nativeLanguageId, {
       cardId: cardToUpdate.id,
       languageId: cardToUpdate.nativeLanguageId,
       values: nativeWords,
     });
 
-    if (!updatedForeignWordsDTO) {
-      updatedForeignWordsDTO = await WordsService.update(cardToUpdate.foreignLanguageId, {
+    if (!updatedForeignWords) {
+      updatedForeignWords = WordsService.update(cardToUpdate.foreignLanguageId, {
         cardId: cardToUpdate.id,
         languageId: foreignLanguageId ? foreignLanguageId : cardToUpdate.foreignLanguageId,
         values: foreignWords,
       });
     }
 
-    const updatedCard = await CardsRepository.update(userId, cardId, foreignLanguageId);
+    const updatedCard = CardsRepository.update(userId, cardId, foreignLanguageId);
 
-    return new CardDTO(updatedCard, updatedNativeWordsDTO, updatedForeignWordsDTO);
+    const updatedCardWithWords = await Promise.all([updatedCard, updatedNativeWords, updatedForeignWords]);
+
+    return new CardDTO(...updatedCardWithWords);
   };
 
   static delete = async (userId: number, cardId: number): Promise<void> => {

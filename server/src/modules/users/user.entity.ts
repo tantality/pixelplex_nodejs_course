@@ -30,7 +30,4 @@ export class User extends CommonEntity implements IUser {
 
   @Column({ type: 'enum', enum: USER_ROLE, default: USER_ROLE.USER })
     role!: string;
-
-  @Column({ type: 'varchar', length: MAX_STRING_LENGTH, nullable: true })
-    refreshToken!: string | null;
 }

@@ -10,8 +10,8 @@ import {
   USER_NOT_FOUND_MESSAGE,
 } from '../../errors/error-messages.constants';
 import { UsersService } from '../users/users.service';
-import { IAuth, LogInBody, SignUpBody } from './types';
-import { JWTService } from './jwt.service';
+import { IAuth, LogInBody, RefreshTokenWithUserId, SignUpBody } from './types';
+import { TokensService } from './tokens.service';
 import { SALT_ROUNDS } from './auth.constants';
 
 export class AuthService {
@@ -24,9 +24,9 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
     const { id, role } = await UsersService.create({ ...body, normalizedEmail, password: hashedPassword });
-    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+    const { accessToken, refreshToken } = TokensService.generateTokens({ userId: id, role });
 
-    await UsersService.update(id, { refreshToken });
+    await TokensService.save({ userId: id, refreshToken });
 
     return {
       id,
@@ -42,15 +42,15 @@ export class AuthService {
       throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
     }
 
-    const isPasswordsEquals = await bcrypt.compare(password, user.password);
-    if (!isPasswordsEquals) {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       throw new UnauthorizedError(INVALID_PASSWORD_MESSAGE);
     }
 
     const { id, role } = user;
-    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+    const { accessToken, refreshToken } = TokensService.generateTokens({ userId: id, role });
 
-    await UsersService.update(id, { refreshToken });
+    await TokensService.save({ userId: id, refreshToken });
 
     return {
       id,
@@ -59,8 +59,8 @@ export class AuthService {
     };
   };
 
-  static logOut = async (userId: number): Promise<void> => {
-    await UsersService.update(userId, { refreshToken: null });
+  static logOut = async (tokenData: RefreshTokenWithUserId): Promise<void> => {
+    await TokensService.delete(tokenData);
   };
 
   static refresh = async (refreshTokenReceived?: string): Promise<IAuth> => {
@@ -68,23 +68,23 @@ export class AuthService {
       throw new UnauthorizedError(REFRESH_TOKEN_IS_MISSING_MESSAGE);
     }
 
-    const user = await UsersService.findOneByCondition({ refreshToken: refreshTokenReceived });
-    if (!user) {
+    const token = await TokensService.findOneByCondition({ refreshToken: refreshTokenReceived });
+    if (!token) {
       throw new NotFoundError(REFRESH_TOKEN_NOT_FOUND_MESSAGE);
     }
 
-    const verifiedRefreshToken = JWTService.validateRefreshToken(refreshTokenReceived);
+    const verifiedRefreshToken = TokensService.validateRefreshToken(refreshTokenReceived);
     if (!verifiedRefreshToken) {
       throw new UnauthorizedError(REFRESH_TOKEN_IS_INVALID_MESSAGE);
     }
 
-    const { id, role } = user;
-    const { accessToken, refreshToken } = JWTService.generateTokens({ userId: id, role });
+    const { userId, role } = verifiedRefreshToken;
+    const { accessToken, refreshToken } = TokensService.generateTokens({ userId, role });
 
-    await UsersService.update(id, { refreshToken });
+    await TokensService.update(token.id, { userId, refreshToken });
 
     return {
-      id,
+      id: userId,
       accessToken,
       refreshToken,
     };
