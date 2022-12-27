@@ -25,10 +25,10 @@ export class WordsRepository {
   ): Promise<Word | null> => {
     const word = await Word.createQueryBuilder('word')
       .leftJoinAndSelect('word.card', 'card')
-      .where('card.userId=:userId', { userId })
-      .andWhere('card.nativeLanguageId=:nativeLanguageId', { cardNativeLanguageId })
-      .andWhere('card.foreignLanguageId=:foreignLanguageId', { cardForeignLanguageId })
-      .andWhere('word.languageId=:languageId', { wordLanguageId })
+      .where(`card.userId=${ userId }`)
+      .andWhere(`card.nativeLanguageId = ${ cardNativeLanguageId }`)
+      .andWhere(`card.foreignLanguageId = ${ cardForeignLanguageId }`)
+      .andWhere(`word.languageId = ${ wordLanguageId }`)
       .orderBy('RANDOM()')
       .getOne();
 
