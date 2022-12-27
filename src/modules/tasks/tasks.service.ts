@@ -12,7 +12,7 @@ import { TasksRepository } from './tasks.repository';
 import { Statistics, TASK_TYPE, CreatedTaskDTO, TASK_STATUS, UpdateTaskParams, TaskIdWithWordData } from './types';
 import { CreateTaskBody, UpdateTaskBody } from './types/body.types';
 import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
-import { getTaskStatus, createQueryBuilderToFindCardIds } from './utils';
+import { getTaskStatus } from './utils';
 
 export class TasksService {
   private static getLanguageIdCondition = (
@@ -124,10 +124,9 @@ export class TasksService {
     } = (await WordsService.findOneWithJoinedCard(hiddenWordId)) as Word;
 
     const languageId = type === TASK_TYPE.TO_NATIVE ? nativeLanguageId : foreignLanguageId;
-    const findCardIdsQueryBuilder = createQueryBuilderToFindCardIds(userId, nativeLanguageId, foreignLanguageId, value);
-    const answers = await WordsService.findCorrectAnswersToTask(findCardIdsQueryBuilder, languageId);
+    const correctAnswers = await WordsService.findCorrectAnswersToTask(userId, nativeLanguageId, foreignLanguageId, value, languageId);
 
-    return answers;
+    return correctAnswers;
   };
 
   static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {

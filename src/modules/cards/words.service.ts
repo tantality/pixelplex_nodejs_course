@@ -1,4 +1,4 @@
-import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { CreateWordsData, FindAnswersQueryResult, UpdateWordsData, WordToCreate } from './types';
 import { getWordsDTO, prepareWordsToCreate } from './utils';
 import { WordDTO } from './word.dto';
@@ -26,8 +26,15 @@ export class WordsService {
     return word;
   };
 
-  static findCorrectAnswersToTask = async (findCardIdsQueryBuilder: SelectQueryBuilder<Word>, languageId: number): Promise<string[]> => {
-    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(findCardIdsQueryBuilder, languageId);
+  static findCorrectAnswersToTask = async (
+    userId: number,
+    cardNativeLanguageId: number,
+    cardForeignLanguageId: number,
+    wordValue: string,
+    wordLanguageId: number,
+  ): Promise<string[]> => {
+    const findCardIdsQueryBuilder = WordsRepository.createQueryBuilderToFindCardIds(userId, cardNativeLanguageId, cardForeignLanguageId, wordValue);
+    const { answers }: FindAnswersQueryResult = await WordsRepository.findCorrectAnswersToTask(findCardIdsQueryBuilder, wordLanguageId);
     if (!answers) {
       return [];
     }
