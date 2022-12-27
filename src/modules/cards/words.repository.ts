@@ -48,6 +48,21 @@ export class WordsRepository {
     return answers;
   };
 
+  static createQueryBuilderToFindCardIds = (
+    userId: number,
+    nativeLanguageId: number,
+    foreignLanguageId: number,
+    wordValue: string,
+  ): SelectQueryBuilder<Word> => {
+    return Word.createQueryBuilder('word')
+      .select('word.cardId')
+      .leftJoin('word.card', 'card')
+      .where(`card.userId = ${userId}`)
+      .andWhere(`card.nativeLanguageId = ${nativeLanguageId}`)
+      .andWhere(`card.foreignLanguageId = ${foreignLanguageId}`)
+      .andWhere(`word.value = '${wordValue}'`);
+  };
+
   static create = async (words: WordToCreate[]): Promise<Word[]> => {
     const createdWords = Word.create(words as DeepPartial<Word[]>);
     const savedWords = await Word.save(createdWords);
