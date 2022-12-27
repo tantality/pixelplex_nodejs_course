@@ -1,3 +1,1 @@
-type WithTaskId = { taskId: number };
-
-export type AddAnswerToTaskParams = WithTaskId;
+export type UpdateTaskParams = { taskId: number };

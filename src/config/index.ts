@@ -6,6 +6,7 @@ import * as Migrations from '../migrations';
 import { Token } from '../modules/auth/token.entity';
 import { Card } from '../modules/cards/card.entity';
 import { Word } from '../modules/cards/word.entity';
+import { Task } from '../modules/tasks/task.entity';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ export const DB: DataSourceOptions = {
   database: 'flashcards',
   synchronize: true,
   logging: false,
-  entities: [Language, User, Token, Card, Word],
+  entities: [Language, User, Token, Card, Word, Task],
   migrations: Object.values(Migrations),
   migrationsRun: true,
 };

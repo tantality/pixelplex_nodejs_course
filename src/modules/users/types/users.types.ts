@@ -1,3 +1,5 @@
+import { UpdateUserBody } from './body.types';
+
 export interface IUser {
   id: number;
   nativeLanguageId: number | null;
