@@ -1,13 +1,12 @@
-import { DeepPartial, FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
 import AppDataSource from '../../data-source';
 import { FindAnswersQueryResult, WordToCreate } from './types';
+import { getRandomInt } from './utils';
 import { Word } from './word.entity';
 
 export class WordsRepository {
-  static findAllByCondition = async (whereCondition: FindOptionsWhere<Word>): Promise<Word[] | null> => {
-    const words = await Word.find({
-      where: whereCondition,
-    });
+  static findAllByCondition = async (condition: FindManyOptions<Word>): Promise<Word[] | null> => {
+    const words = await Word.find(condition);
 
     return words;
   };
@@ -17,22 +16,32 @@ export class WordsRepository {
     return word;
   };
 
+  static countAll = async (whereCondition: FindOptionsWhere<Word>): Promise<number> => {
+    const count = await Word.countBy(whereCondition);
+    return count;
+  };
+
   static findRandomOne = async (
     userId: number,
     cardNativeLanguageId: number,
     cardForeignLanguageId: number,
     wordLanguageId: number,
   ): Promise<Word | null> => {
-    const word = await Word.createQueryBuilder('word')
-      .leftJoinAndSelect('word.card', 'card')
-      .where(`card.userId=${ userId }`)
-      .andWhere(`card.nativeLanguageId = ${ cardNativeLanguageId }`)
-      .andWhere(`card.foreignLanguageId = ${ cardForeignLanguageId }`)
-      .andWhere(`word.languageId = ${ wordLanguageId }`)
-      .orderBy('RANDOM()')
-      .getOne();
+    const whereCondition: FindOptionsWhere<Word> = {
+      languageId: wordLanguageId,
+      card: { userId, nativeLanguageId: cardNativeLanguageId, foreignLanguageId: cardForeignLanguageId },
+    };
 
-    return word;
+    const wordCount = await WordsRepository.countAll(whereCondition);
+    const randomWordIndex = getRandomInt(wordCount);
+
+    const word = await WordsRepository.findAllByCondition({
+      where: whereCondition,
+      skip: randomWordIndex,
+      take: 1,
+    });
+
+    return word ? word[0] : null;
   };
 
   static findCorrectAnswersToTask = async (
