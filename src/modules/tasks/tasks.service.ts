@@ -12,7 +12,7 @@ import { TasksRepository } from './tasks.repository';
 import { Statistics, TASK_TYPE, CreatedTaskDTO, TASK_STATUS, UpdateTaskParams, TaskIdWithWordData } from './types';
 import { CreateTaskBody, UpdateTaskBody } from './types/body.types';
 import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
-import { getTaskStatus } from './utils';
+import { getAnswerStatus } from './utils';
 
 export class TasksService {
   private static getLanguageIdCondition = (
@@ -130,27 +130,27 @@ export class TasksService {
   };
 
   static update = async (userId: number, { taskId }: UpdateTaskParams, { answer }: UpdateTaskBody): Promise<TaskDTO> => {
-    const task = await TasksService.findOneByCondition({ id: taskId, userId });
-    if (!task) {
+    const taskToUpdate = await TasksService.findOneByCondition({ id: taskId, userId });
+    if (!taskToUpdate) {
       throw new NotFoundError(TASK_NOT_FOUND_MESSAGE);
     }
 
-    if (task.status !== TASK_STATUS.UNANSWERED) {
+    const { id, hiddenWordId, type, status } = taskToUpdate;
+
+    if (status !== TASK_STATUS.UNANSWERED) {
       throw new BadRequestError(ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE);
     }
 
-    const { id, hiddenWordId, type } = task;
-
     const correctAnswers = await TasksService.findCorrectAnswers(hiddenWordId, userId, type);
-    const status = getTaskStatus(correctAnswers, answer);
-    const updatedTask = await TasksRepository.update(id, correctAnswers, answer, status);
+    const answerStatus = getAnswerStatus(correctAnswers, answer);
+    const updatedTask = await TasksRepository.update(id, correctAnswers, answer, answerStatus);
 
     const {
       hiddenWord: {
         value,
         card: { nativeLanguageId, foreignLanguageId },
       },
-    } = (await TasksRepository.findTaskPartForDTO(id)) as TaskIdWithWordData;
+    } = (await TasksRepository.findTaskPartToCreateDTO(id)) as TaskIdWithWordData;
 
     return new TaskDTO(updatedTask, value, nativeLanguageId, foreignLanguageId);
   };

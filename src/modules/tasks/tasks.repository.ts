@@ -58,7 +58,7 @@ export class TasksRepository {
     return task;
   };
 
-  static findTaskPartForDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
+  static findTaskPartToCreateDTO = async (id: number): Promise<TaskIdWithWordData | null> => {
     const task: TaskIdWithWordData | null = await Task.createQueryBuilder('task')
       .select(['task.id', 'card.nativeLanguageId', 'card.foreignLanguageId', 'word.value'])
       .leftJoin('task.hiddenWord', 'word')
