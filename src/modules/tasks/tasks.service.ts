@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Like } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE, NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE, TASK_NOT_FOUND_MESSAGE } from '../../errors';
 import { BadRequestError, NotFoundError } from '../../errors/app.error';
 import { checkLanguagesValidity } from '../../utils';
@@ -15,70 +15,8 @@ import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
 import { getAnswerStatus } from './utils';
 
 export class TasksService {
-  private static getLanguageIdCondition = (
-    baseCondition: FindOptionsWhere<Task>,
-    languageIdType: 'foreignLanguageId' | 'nativeLanguageId',
-    languageId?: number,
-  ): FindOptionsWhere<Task> => {
-    let languageIdCondition: FindOptionsWhere<Task> = {};
-    if (languageId) {
-      languageIdCondition = {
-        hiddenWord: {
-          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
-          card: {
-            [languageIdType]: languageId,
-          },
-        },
-      };
-    }
-
-    return languageIdCondition;
-  };
-
-  private static getBaseCondition = (
-    userId: number,
-    { search, taskStatus }: Pick<GetTasksQuery, 'search' | 'taskStatus'>,
-  ): FindOptionsWhere<Task> => {
-    let baseCondition: FindOptionsWhere<Task> = { userId, hiddenWord: {} as FindOptionsWhere<Word> };
-
-    if (search) {
-      baseCondition = {
-        ...baseCondition,
-        hiddenWord: {
-          value: Like(`%${search}%`),
-        },
-      };
-    }
-
-    if (taskStatus) {
-      baseCondition = { ...baseCondition, status: taskStatus };
-    }
-
-    return baseCondition;
-  };
-
-  private static getWhereCondition = (
-    userId: number,
-    { search, taskStatus, languageId }: Pick<GetTasksQuery, 'search' | 'taskStatus' | 'languageId'>,
-  ): FindOptionsWhere<Task>[] => {
-    const whereCondition: FindOptionsWhere<Task>[] = [];
-    const baseCondition = TasksService.getBaseCondition(userId, { search, taskStatus });
-
-    const nativeLanguageIdCondition = TasksService.getLanguageIdCondition(baseCondition, 'nativeLanguageId', languageId);
-    const foreignLanguageIdCondition = TasksService.getLanguageIdCondition(baseCondition, 'foreignLanguageId', languageId);
-
-    whereCondition.push({ ...baseCondition, ...nativeLanguageIdCondition });
-    whereCondition.push({ ...baseCondition, ...foreignLanguageIdCondition });
-
-    return whereCondition;
-  };
-
-  static findAndCountAll = async (
-    userId: number,
-    { search, sortDirection, limit, offset, taskStatus, languageId }: GetTasksQuery,
-  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
-    const whereCondition = TasksService.getWhereCondition(userId, { search, taskStatus, languageId });
-    const tasksAndTheirNumber = await TasksRepository.findAndCountAll(offset, limit, sortDirection, whereCondition);
+  static findAndCountAll = async (userId: number, query: GetTasksQuery): Promise<{ count: number; tasks: TaskDTO[] }> => {
+    const tasksAndTheirNumber = await TasksRepository.findAndCountAll(userId, query);
 
     return tasksAndTheirNumber;
   };
