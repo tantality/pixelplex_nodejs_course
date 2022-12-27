@@ -1,9 +1,5 @@
 import { FindOptionsWhere, Like } from 'typeorm';
-import {
-  ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE,
-  NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE,
-  TASK_NOT_FOUND_MESSAGE,
-} from '../../errors';
+import { ANSWER_TO_TASK_ALREADY_EXISTS_MESSAGE, NO_CARDS_FOUND_WITH_THE_LANGUAGE_MESSAGE, TASK_NOT_FOUND_MESSAGE } from '../../errors';
 import { BadRequestError, NotFoundError } from '../../errors/app.error';
 import { checkLanguagesValidity } from '../../utils';
 import { Word } from '../cards/word.entity';
@@ -19,11 +15,30 @@ import { GetStatisticsQuery, GetTasksQuery } from './types/query.types';
 import { getTaskStatus, createQueryBuilderToFindCardIds } from './utils';
 
 export class TasksService {
-  static findAndCountAll = async (
+  private static getLanguageIdCondition = (
+    baseCondition: FindOptionsWhere<Task>,
+    languageIdType: 'foreignLanguageId' | 'nativeLanguageId',
+    languageId?: number,
+  ): FindOptionsWhere<Task> => {
+    let languageIdCondition: FindOptionsWhere<Task> = {};
+    if (languageId) {
+      languageIdCondition = {
+        hiddenWord: {
+          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
+          card: {
+            [languageIdType]: languageId,
+          },
+        },
+      };
+    }
+
+    return languageIdCondition;
+  };
+
+  private static getBaseCondition = (
     userId: number,
-    { search, sortDirection, limit, offset, taskStatus, languageId }: GetTasksQuery,
-  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
-    const whereCondition: FindOptionsWhere<Task>[] = [];
+    { search, taskStatus }: Pick<GetTasksQuery, 'search' | 'taskStatus'>,
+  ): FindOptionsWhere<Task> => {
     let baseCondition: FindOptionsWhere<Task> = { userId, hiddenWord: {} as FindOptionsWhere<Word> };
 
     if (search) {
@@ -39,32 +54,30 @@ export class TasksService {
       baseCondition = { ...baseCondition, status: taskStatus };
     }
 
-    let taskWithNativeLanguageCondition: FindOptionsWhere<Task> | null = null;
-    let taskWithForeignLanguageCondition: FindOptionsWhere<Task> | null = null;
+    return baseCondition;
+  };
 
-    if (languageId) {
-      taskWithNativeLanguageCondition = {
-        hiddenWord: {
-          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
-          card: {
-            nativeLanguageId: languageId,
-          },
-        } as FindOptionsWhere<Word>,
-      } as FindOptionsWhere<Task>;
+  private static getWhereCondition = (
+    userId: number,
+    { search, taskStatus, languageId }: Pick<GetTasksQuery, 'search' | 'taskStatus' | 'languageId'>,
+  ): FindOptionsWhere<Task>[] => {
+    const whereCondition: FindOptionsWhere<Task>[] = [];
+    const baseCondition = TasksService.getBaseCondition(userId, { search, taskStatus });
 
-      taskWithForeignLanguageCondition = {
-        hiddenWord: {
-          ...(baseCondition.hiddenWord as FindOptionsWhere<Word>),
-          card: {
-            foreignLanguageId: languageId,
-          },
-        } as FindOptionsWhere<Word>,
-      } as FindOptionsWhere<Task>;
-    }
+    const nativeLanguageIdCondition = TasksService.getLanguageIdCondition(baseCondition, 'nativeLanguageId', languageId);
+    const foreignLanguageIdCondition = TasksService.getLanguageIdCondition(baseCondition, 'foreignLanguageId', languageId);
 
-    whereCondition.push({ ...baseCondition, ...taskWithNativeLanguageCondition });
-    whereCondition.push({ ...baseCondition, ...taskWithForeignLanguageCondition });
+    whereCondition.push({ ...baseCondition, ...nativeLanguageIdCondition });
+    whereCondition.push({ ...baseCondition, ...foreignLanguageIdCondition });
 
+    return whereCondition;
+  };
+
+  static findAndCountAll = async (
+    userId: number,
+    { search, sortDirection, limit, offset, taskStatus, languageId }: GetTasksQuery,
+  ): Promise<{ count: number; tasks: TaskDTO[] }> => {
+    const whereCondition = TasksService.getWhereCondition(userId, { search, taskStatus, languageId });
     const tasksAndTheirNumber = await TasksRepository.findAndCountAll(offset, limit, sortDirection, whereCondition);
 
     return tasksAndTheirNumber;
