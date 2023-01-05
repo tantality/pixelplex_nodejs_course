@@ -17,7 +17,6 @@ import { getAnswerStatus } from './utils';
 export class TasksService {
   static findAndCountAll = async (userId: number, query: GetTasksQuery): Promise<{ count: number; tasks: TaskDTO[] }> => {
     const tasksAndTheirNumber = await TasksRepository.findAndCountAll(userId, query);
-
     return tasksAndTheirNumber;
   };
 

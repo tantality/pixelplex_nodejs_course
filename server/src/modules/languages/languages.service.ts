@@ -76,11 +76,13 @@ export class LanguagesService {
       throw new NotFoundError(LANGUAGE_NOT_FOUND_MESSAGE);
     }
 
-    const languageIsUsedInUsers = await UsersService.findOneByCondition({ nativeLanguageId: languageId });
-    const languageIsUsedInCards = await CardsService.findOneByCondition([
+    const languageIsUsedInUsersPromise = UsersService.findOneByCondition({ nativeLanguageId: languageId });
+    const languageIsUsedInCardsPromise = CardsService.findOneByCondition([
       { nativeLanguageId: languageId },
       { foreignLanguageId: languageId },
     ]);
+
+    const [languageIsUsedInUsers, languageIsUsedInCards] = await Promise.all([languageIsUsedInUsersPromise, languageIsUsedInCardsPromise]);
 
     if (languageIsUsedInUsers || languageIsUsedInCards) {
       throw new BadRequestError(LANGUAGE_CANNOT_BE_DELETED_MESSAGE);
