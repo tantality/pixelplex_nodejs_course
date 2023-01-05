@@ -1,4 +1,7 @@
+/* eslint-disable import/default */
+/* eslint-disable import/no-named-as-default-member */
 import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE, AUTHORIZATION_HEADER_IS_MISSING_MESSAGE, UnauthorizedError } from '../errors';
 import { TokensService } from '../modules/auth/tokens.service';
 
@@ -18,6 +21,10 @@ export function isAuth<T>(req: T, _res: Response, next: NextFunction): void {
 
     next();
   } catch (err) {
-    next(new UnauthorizedError(ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE));
+    if (err instanceof jwt.JsonWebTokenError) {
+      next(new UnauthorizedError(ACCESS_TOKEN_IS_MISSING_OR_INVALID_MESSAGE));
+    }
+
+    next(err);
   }
 }
